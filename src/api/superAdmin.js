@@ -39,4 +39,29 @@ export const login = data => {
 //   })
 // }
 
+//学校信息处理
+//获取学院
+export const getDepartments = data => {
+  return request({
+    method: 'POST',
+    url: '/web/school/departments',
+    data
+  })
+}
+//获取班级信息  按班级名称查询校验
+export const getClasses = data => {
+  return request({
+    method: 'POST',
+    url: '/web/school/classes',
+    data
+  })
+}
+//获取宿舍信息  按宿舍名称查询校验
+export const getDormitories = data => {
+  return request({
+    method: 'POST',
+    url: '/web/dormitories',
+    data
+  })
+}
 

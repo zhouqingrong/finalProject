@@ -1,83 +1,64 @@
 <template>
   <div>
-    <!-- 添加班级-->
+    <!-- 添加宿舍 -->
     <el-dialog
       :before-close="beforeClose"
       append-to-body
       :close-on-click-modal="false"
       :visible="visible"
       @update:visible="$emit('update:visible', $event)"
-      title="新增班级"
+      title="新增宿舍"
       width="850px"
     >
       <el-form :model="form" inline ref="form">
         <div class="dialog-container">
           <!-- class="dorm-item" -->
-          <section :key="i.class_num" v-for="(i, index) in form.class">
+          <section
+            :key="i.dormitory_num"
+            v-for="(i, index) in form.dormitories"
+          >
             <!-- :prop="'dorms.' + index + '.building_num'" -->
             <el-form-item
-              :prop="'class.' + index + '.class_department'"
+              :prop="'i.' + index + '.dormitory_commmunity'"
               :rules="[
-                { required: true, message: '请选择学院', trigger: 'change' },
+                { required: true, message: '请选择社区', trigger: 'change' },
               ]"
-              label="学院"
+              label=""
               label-width="90px"
             >
               <el-select
-                placeholder="请选择学院"
+                placeholder="请选择社区"
                 size="medium"
                 style="width: 130px"
-                v-model="i.class_department"
+                v-model="i.dormitory_commmunity"
               >
                 <el-option
                   :key="item._id"
-                  :label="item.department"
-                  :value="item.department"
-                  v-for="item in options.departments"
+                  :label="item.name"
+                  :value="item.name"
+                  v-for="item in options.community"
                 />
               </el-select>
             </el-form-item>
             <el-form-item
-              :prop="'class.' + index + '.class_marjor'"
+              :prop="'i.' + index + '.dormitory_name'"
               :rules="[
-                { required: true, message: '请选择专业', trigger: 'change' },
-              ]"
-              label="专业"
-              label-width="90px"
-            >
-              <el-select
-                placeholder="请选择专业"
-                size="medium"
-                style="width: 130px"
-                v-model="i.class_marjor"
-              >
-                <el-option
-                  :key="item._id"
-                  :label="item.marjor"
-                  :value="item.marjor"
-                  v-for="item in options.marjors"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item
-              :prop="'class.' + index + '.name'"
-              :rules="[
-                { required: true, message: '请输入班级' }, //可以限制数字、4位
+                { required: true, message: '请输入宿舍' }, //可以限制数字、4位
                 // { validator: checkUniqueNum },//需要校验是不是已存在
               ]"
-              label="班级"
+              label="宿舍"
             >
               <el-input
-                placeholder="例如：1702"
+                placeholder="例如：1#B510"
                 size="medium"
                 style="width: 120px"
-                v-model="i.class_name"
+                v-model="i.dormitory_name"
               />
             </el-form-item>
 
             <el-form-item>
               <el-button
-                :disabled="form.class.length === 1"
+                :disabled="form.dormitories.length === 1"
                 @click="del(index)"
                 circle
                 icon="el-icon-minus"
@@ -94,17 +75,12 @@
                 type="primary"
               />
             </el-form-item>
-            <!-- <el-form-item v-if="getDormNum(dorm.building_num, dorm.house_num)">
-              <p class="tip-small">
-                宿舍号：{{ getDormNum(dorm.building_num, dorm.house_num) }}
-              </p>
-            </el-form-item> -->
           </section>
         </div>
       </el-form>
       <template #footer>
         <!-- 一键设置 -->
-        <el-form :model="quickForm" class="text-left" inline>
+        <!-- <el-form :model="quickForm" class="text-left" inline>
           <el-form-item label="快速设置：" label-width="90px" />
           <el-form-item prop="class_department_active">
             <el-checkbox v-model="quickForm.class_department_active"
@@ -151,7 +127,7 @@
               >一键设置</el-button
             >
           </el-form-item>
-        </el-form>
+        </el-form> -->
         <!-- 一键设置结束 -->
         <section class="flex-center">
           <el-button @click="submit" type="primary">确认添加</el-button>
@@ -183,43 +159,40 @@
 
 class Item {
   constructor() {
-    this.class_department = "";
-    this.class_marjor = "";
-    this.class_name = 1702;
-    this.class_num = "" + Math.random() * Date.now();
+    this.dormitory_num = "";
+    this.dormitory_community = "";
+    this.dormitory_name = "";
+    // this.class_num = "" + Math.random() * Date.now();
   }
 }
 
 export default {
-  name: "add-class",
+  name: "add-dormitory",
   props: {
     visible: Boolean,
   },
   data() {
     return {
       form: {
-        class: [new Item()],
+        dormitories: [new Item()],
       },
       options: {
-        buildings: [],
-        departments: [
+        community: [
           {
             _id: "1",
-            department: "信电学院",
+            name: "1社区",
           },
           {
             _id: "2",
-            department: "机械学院",
-          },
-        ],
-        marjors: [
-          {
-            id: 1,
-            marjor: "软件工程",
+            name: "2社区",
           },
           {
-            id: 2,
-            marjor: "自动化",
+            _id: "3",
+            name: "3社区",
+          },
+          {
+            _id: "4",
+            name: "4社区",
           },
         ],
       },

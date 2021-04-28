@@ -26,12 +26,12 @@ const routes = [
     component: Login
   },
   {
-    path: '',
+    path: '/admin',
     // name: 'layout',//当有子路由时，父路由不用取名字name，取了名字会有无意义的警告
     component: Layout,
     children: [
       {
-        path: '', //''path为空，会作为默认子路由渲染
+        path: '/home', //''path为空，会作为默认子路由渲染
         name: 'home',
         component: Home
       },

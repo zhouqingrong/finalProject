@@ -45,7 +45,7 @@ export default {
       return [
         {
           title: "系统首页",
-          index: "/",
+          index: "/home",
           icon: "el-icon-house",
           show: true,
         },
@@ -92,12 +92,12 @@ export default {
           icon: "el-icon-circle-check",
           show: identity === 2,
         },
-        {
-          title: "权限管理",
-          index: "/role",
-          icon: "el-icon-circle-check",
-          show: identity === 2,
-        },
+        // {
+        //   title: "权限管理",
+        //   index: "/role",
+        //   icon: "el-icon-circle-check",
+        //   show: identity === 2,
+        // },
         {
           title: "个人设置",
           index: "/setting",

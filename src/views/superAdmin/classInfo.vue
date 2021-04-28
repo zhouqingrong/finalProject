@@ -57,7 +57,7 @@ import ClassTable from "@/components/class/class-table.vue";
 import AddClass from "../../components/class/add-class.vue";
 
 export default {
-  name: "",
+  name: "classInfo",
   components: { ClassTable, AddClass },
   props: {},
   data() {

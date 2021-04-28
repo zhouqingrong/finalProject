@@ -1,22 +1,22 @@
 <template>
   <div class="EditClassContainer">
-    <!-- 编辑班级信息 -->
+    <!-- 编辑admin信息 -->
     <el-dialog
       append-to-body
       :before-close="beforeClose"
       :close-on-click-modal="false"
-      :title="'修改' + curDetail.class_name + '的信息'"
+      :title="'修改' + curDetail.admin_name + '的信息'"
       :visible="visible"
       @update:visible="$emit('update:visible', $event)"
       width="500px"
     >
       <el-form :model="info" label-width="100px" ref="form">
-        <el-form-item label="序号" prop="class_num">
+        <el-form-item label="序号" prop="admin_num">
           <el-input :value="info.class_num" disabled style="width: 200px" />
         </el-form-item>
         <el-form-item
           label="学院"
-          prop="class_department"
+          prop="admin_department"
           :rules="[{ required: true, message: '学院不能为空' }]"
         >
           <el-select
@@ -30,18 +30,25 @@
           </el-select>
         </el-form-item>
         <el-form-item
-          :rules="[{ required: true, message: '专业不能为空' }]"
-          label="专业"
-          prop="class_marjor"
+          :rules="[{ required: true, message: '账号不能为空' }]"
+          label="账号"
+          prop="admin_account"
         >
-          <el-input style="width: 200px" v-model="info.class_marjor" />
+          <el-input style="width: 200px" v-model="info.admin_account" />
         </el-form-item>
         <el-form-item
-          :rules="[{ required: true, message: '班级不能为空' }]"
-          label="班级"
-          prop="class_name"
+          :rules="[{ required: true, message: '姓名不能为空' }]"
+          label="姓名"
+          prop="admin_name"
         >
-          <el-input style="width: 200px" v-model="info.class_name" />
+          <el-input style="width: 200px" v-model="info.admin_name" />
+        </el-form-item>
+        <el-form-item
+          :rules="[{ required: true, message: '联系方式不能为空' }]"
+          label="电话"
+          prop="admin_phone"
+        >
+          <el-input style="width: 200px" v-model="info.admin_phone" />
         </el-form-item>
         <section class="flex-center">
           <el-button @click="save" type="primary">保存</el-button>
@@ -53,7 +60,7 @@
 </template>
 <script>
 export default {
-  name: "edit-class",
+  name: "edit-admin",
   components: {},
   props: {
     curDetail: {

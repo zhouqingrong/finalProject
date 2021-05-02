@@ -15,7 +15,7 @@
               v-model="searchForm.departmentKeyword"
             />
           </el-form-item>
-          <el-form-item label="">
+          <el-form-item label>
             <el-input
               clearable
               placeholder="按专业搜索"
@@ -26,22 +26,14 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button
-              native-type="submit"
-              size="medium"
-              type="primary"
-              @click="getData"
-              >搜索</el-button
-            >
+            <el-button native-type="submit" size="medium" type="primary" @click="getData">搜索</el-button>
           </el-form-item>
         </el-form>
       </div>
       <!-- 新增班级按钮 -->
       <div style="margin-left: auto !important">
         <!--  -->
-        <el-button size="medium" type="info" @click="isShowAddDialog = true"
-          >新增班级</el-button
-        >
+        <el-button size="medium" type="info" @click="isShowAddDialog = true">新增班级</el-button>
       </div>
     </section>
     <!-- 班级表格 -->
@@ -50,6 +42,7 @@
       :cur-pageSize="paging.pageSize"
       :list="classData"
       :total="paging.total"
+      :loading="loading"
       @current-change="curPageChange"
       @size-change="curPageSizeChange"
       @select:selected="onSelect"
@@ -74,6 +67,7 @@ export default {
   props: {},
   data() {
     return {
+      loading: false,
       searchForm: {
         departmentKeyword: "",
         majorKeyword: "",
@@ -107,15 +101,18 @@ export default {
         departmentName: this.searchForm.departmentKeyword,
         majorName: this.searchForm.majorKeyword,
       };
+      this.loading = true;
       getClasses(data)
         .then((res) => {
           console.log("班级表格success的res", res);
           this.classData = res.data.data.classes;
           this.paging.total = res.data.data.pageInfo.totalCount;
+          this.loading = false;
         })
         .catch((err) => {
           console.log("班级表格err", err);
           this.$message.error("获取班级失败");
+          this.loading = false;
         });
       // request.post("/api/student/search", form).then((res) => {
       //   this.studentData = res.data.data.list;

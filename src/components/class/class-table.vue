@@ -7,15 +7,11 @@
       @selection-change="selected"
       border
       stripe
+      v-loading="loading"
     >
       <!-- <el-table-column align="center" type="selection" width="55" /> -->
       <el-table-column align="center" label="序号" prop="id" sortable />
-      <el-table-column
-        align="center"
-        label="学院"
-        prop="departmentName"
-        sortable
-      />
+      <el-table-column align="center" label="学院" prop="departmentName" sortable />
       <el-table-column align="center" label="专业" prop="majorName" sortable />
       <el-table-column align="center" label="班级" prop="classNo" sortable />
       <el-table-column align="center" label="操作">
@@ -52,15 +48,10 @@
       :page-size="curPageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
-    >
-    </el-pagination>
+    ></el-pagination>
 
     <!--  编辑/查看-->
-    <edit-class
-      :curDetail.sync="curDetail"
-      :visible.sync="isShowModify"
-      @update="$emit('update')"
-    />
+    <edit-class :curDetail.sync="curDetail" :visible.sync="isShowModify" @update="$emit('update')" />
   </div>
 </template>
 <script>
@@ -79,6 +70,7 @@ export default {
     curPageSize: Number, //当前每页多少条
     edit: Boolean,
     del: Boolean,
+    loading: Boolean,
   },
   data() {
     return {

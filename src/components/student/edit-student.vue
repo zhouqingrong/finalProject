@@ -13,34 +13,17 @@
       <el-form-item label="学号" prop="stuNo">
         <el-input :value="info.stuNo" disabled style="width: 200px" />
       </el-form-item>
-      <el-form-item
-        :rules="[{ required: true, message: '姓名不能为空' }]"
-        label="姓名"
-        prop="username"
-      >
+      <el-form-item :rules="[{ required: true, message: '姓名不能为空' }]" label="姓名" prop="username">
         <el-input style="width: 200px" v-model="info.username" />
       </el-form-item>
       <el-form-item label="性别" prop="sex">
-        <el-select
-          placeholder="全部"
-          size="medium"
-          style="width: 100px"
-          v-model="info.sex"
-        >
+        <el-select placeholder="全部" size="medium" style="width: 100px" v-model="info.sex">
           <el-option :value="1" label="男"></el-option>
           <el-option :value="2" label="女"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item
-        :rules="[{ required: true, message: '班级不能为空' }]"
-        label="班级"
-        prop="studentClass"
-      >
-        <el-cascader
-          placeholder="请输入班级"
-          v-model="info.studentClass"
-          :options="options"
-        ></el-cascader>
+      <el-form-item :rules="[{ required: true, message: '班级不能为空' }]" label="班级" prop="studentClass">
+        <el-cascader placeholder="请输入班级" v-model="info.studentClass" :options="options"></el-cascader>
       </el-form-item>
       <el-form-item label="联系方式" prop="phone">
         <el-input style="width: 200px" v-model="info.phone" />
@@ -53,7 +36,7 @@
       </el-form-item>
       <!-- <el-form-item label="辅导员" prop="student_teacher">
         <el-input style="width: 200px" v-model="info.student_teacher" />
-      </el-form-item> -->
+      </el-form-item>-->
       <section class="flex-center">
         <el-button @click="saveStudent" type="primary">保存</el-button>
         <el-button @click="closeDialog">取消</el-button>
@@ -106,28 +89,31 @@ export default {
       this.beforeClose();
     },
     saveStudent() {
-      // await this.$refs.form.validate();
-      let data = {
-        address: this.info.address,
-        classId: this.info.studentClass[2], //班级（级联选择）1702的id
-        phone: this.info.phone,
-        sex: this.info.sex,
-        stuNo: this.info.stuNo,
-        urgentPhone: this.info.urgentPhone,
-        username: this.info.username,
-        id: this.info.id,
-      };
-      updateStudent(data)
-        .then((res) => {
-          console.log("修改学生res", res);
-          this.closeDialog();
-          this.$emit("update");
-          this.$message.success("修改学生信息成功");
-        })
-        .catch((err) => {
-          console.log("修改学生err", err);
-          this.$message.error("修改学生失败");
-        });
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          let data = {
+            address: this.info.address,
+            classId: this.info.studentClass[2], //班级（级联选择）1702的id
+            phone: this.info.phone,
+            sex: this.info.sex,
+            stuNo: this.info.stuNo,
+            urgentPhone: this.info.urgentPhone,
+            username: this.info.username,
+            id: this.info.id,
+          };
+          updateStudent(data)
+            .then((res) => {
+              console.log("修改学生res", res);
+              this.closeDialog();
+              this.$emit("update");
+              this.$message.success("修改学生信息成功");
+            })
+            .catch((err) => {
+              console.log("修改学生err", err);
+              this.$message.error("修改学生失败");
+            });
+        }
+      });
     },
   },
   watch: {

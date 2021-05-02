@@ -7,24 +7,18 @@
       @selection-change="selected"
       border
       stripe
+      v-loading="loading"
     >
       <el-table-column align="center" type="selection" width="55" />
+      <el-table-column align="center" label="序号" prop="id" sortable />
+      <el-table-column align="center" label="社区" prop="community" sortable />
+      <el-table-column align="center" label="楼栋" prop="building" sortable />
+      <el-table-column align="center" label="宿舍" prop="roomName" sortable />
       <el-table-column
+        :formatter="capacityConvert"
         align="center"
-        label="序号"
-        prop="dormitory_num"
-        sortable
-      />
-      <el-table-column
-        align="center"
-        label="社区"
-        prop="dormitory_community"
-        sortable
-      />
-      <el-table-column
-        align="center"
-        label="宿舍"
-        prop="dormitory_name"
+        label="住宿情况"
+        prop="capacity"
         sortable
       />
       <el-table-column align="center" label="操作">
@@ -40,7 +34,7 @@
           </el-tooltip>
           <el-tooltip content="删除" v-if="del">
             <el-button
-              @click="deleteDormitory(scope.row)"
+              @click="showDeleteDormitory(scope.row)"
               circle
               icon="el-icon-delete font-size-16"
               plain
@@ -52,16 +46,16 @@
       </el-table-column>
     </el-table>
     <!-- 分页信息 -->
-    <!-- <el-pagination
-      :current-page="curPage"
-      :total="total"
+    <el-pagination
+      class="pagination"
+      @size-change="$emit('size-change', $event)"
       @current-change="$emit('current-change', $event)"
-      background
-      class="margin-top-20"
-      layout="total, prev, pager, next"
-      style="text-align: right"
-    >
-    </el-pagination> -->
+      :current-page="curPage"
+      :page-sizes="[5, 10, 20, 50]"
+      :page-size="curPageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+    ></el-pagination>
     <!--  编辑/查看-->
     <edit-dormitory
       :curDetail.sync="curDetail"
@@ -72,6 +66,7 @@
 </template>
 <script>
 import EditDormitory from "@/components/dormitory/edit-dormitory"; //编辑
+import { deleteDormitory } from "@/api/superAdmin";
 export default {
   name: "dormitory-table",
   components: { EditDormitory },
@@ -82,8 +77,10 @@ export default {
     },
     total: Number,
     curPage: Number,
+    curPageSize: Number,
     edit: Boolean,
     del: Boolean,
+    loading: Boolean,
   },
   data() {
     return {
@@ -96,6 +93,13 @@ export default {
   created() {},
   mounted() {},
   methods: {
+    //宿舍容量转换
+    capacityConvert(row, column, v) {
+      if (!row.students) {
+        return "0/" + v;
+      }
+      return row.students.length + "/" + v;
+    },
     // 选中宿舍
     selected(selected) {
       this.$emit("select:selected", selected);
@@ -107,20 +111,21 @@ export default {
       this.isShowModify = true;
     },
     // 删除宿舍
-    deleteDormitory(row) {
+    showDeleteDormitory(row) {
       console.log("删除该行信息row", row);
       this.$confirm("此操作将永久删除该学生且无法恢复，是否继续？", "提示", {
         type: "warning",
       }).then(() => {
-        this.request
-          .post("/api/student/removeOneById", { _id: row._id })
+        let data = {
+          id: row.id,
+        };
+        deleteDormitory(data)
           .then((res) => {
-            if (!res.data.errcode) {
-              this.$alert("删除成功！", "提示", { type: "success" });
-              this.$emit("update");
-            } else {
-              this.$alert(res.data.msg, "错误", { type: "error" });
-            }
+            this.$message.success("删除宿舍成功");
+            this.$emit("update");
+          })
+          .catch((err) => {
+            this.$message.error("删除宿舍失败");
           });
       });
     },
@@ -128,4 +133,7 @@ export default {
 };
 </script>
 <style scoped>
+.pagination {
+  margin: 30px auto;
+}
 </style>

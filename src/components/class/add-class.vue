@@ -25,10 +25,7 @@
               label="学院专业"
               label-width="90px"
             >
-              <el-cascader
-                v-model="i.class_department"
-                :options="options"
-              ></el-cascader>
+              <el-cascader v-model="i.class_department" :options="options"></el-cascader>
 
               <!-- <el-select
                 placeholder="请选择学院"
@@ -42,7 +39,7 @@
                   :value="item.department"
                   v-for="item in options.departments"
                 />
-              </el-select> -->
+              </el-select>-->
             </el-form-item>
 
             <el-form-item
@@ -84,7 +81,7 @@
               <p class="tip-small">
                 宿舍号：{{ getDormNum(dorm.building_num, dorm.house_num) }}
               </p>
-            </el-form-item> -->
+            </el-form-item>-->
           </section>
         </div>
       </el-form>
@@ -93,9 +90,7 @@
         <el-form :model="quickForm" class="text-left" inline>
           <el-form-item label="快速设置：" label-width="90px" />
           <el-form-item prop="class_department_active">
-            <el-checkbox v-model="quickForm.class_department_active"
-              >学院专业</el-checkbox
-            >
+            <el-checkbox v-model="quickForm.class_department_active">学院专业</el-checkbox>
           </el-form-item>
           <el-form-item prop="class_department">
             <el-cascader
@@ -105,9 +100,7 @@
             ></el-cascader>
           </el-form-item>
           <el-form-item>
-            <el-button @click="quickSet" size="small" type="primary"
-              >一键设置</el-button
-            >
+            <el-button @click="quickSet" size="small" type="primary">一键设置</el-button>
           </el-form-item>
         </el-form>
         <!-- 一键设置结束 -->
@@ -201,27 +194,31 @@ export default {
     //   }
     // },
     submit() {
-      let data = [];
-      for (let i = 0; i < this.form.class.length; i++) {
-        data.push({
-          classNo: this.form.class[i].class_no, //1702
-          departmentName: this.form.class[i].class_department[0],
-          majorName: this.form.class[i].class_department[1],
-        });
-      }
-      addClass(data)
-        .then((res) => {
-          console.log("addClass的res", res);
-          this.$message.success("添加班级成功");
-          //关闭dialog
-          this.closeDialog();
-          //刷新
-          this.$emit("update");
-        })
-        .catch((err) => {
-          console.log("addClass的err", err);
-          this.$message.error("添加班级失败");
-        });
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          let data = [];
+          for (let i = 0; i < this.form.class.length; i++) {
+            data.push({
+              classNo: this.form.class[i].class_no, //1702
+              departmentName: this.form.class[i].class_department[0],
+              majorName: this.form.class[i].class_department[1],
+            });
+          }
+          addClass(data)
+            .then((res) => {
+              console.log("addClass的res", res);
+              this.$message.success("添加班级成功");
+              //关闭dialog
+              this.closeDialog();
+              //刷新
+              this.$emit("update");
+            })
+            .catch((err) => {
+              console.log("addClass的err", err);
+              this.$message.error("添加班级失败");
+            });
+        }
+      });
     },
     quickSet() {
       this.form.class.forEach((item) => {

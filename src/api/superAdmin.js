@@ -49,14 +49,6 @@ export const getDepartments = data => {
     data
   })
 }
-//获取宿舍信息  按宿舍名称查询校验
-export const getDormitories = data => {
-  return request({
-    method: 'POST',
-    url: '/web/dormitories',
-    data
-  })
-}
 //添加班级
 export const addClass = data => {
   return request({
@@ -127,6 +119,42 @@ export const deleteStudent = data => {
   return request({
     method: 'DELETE',
     url: '/web/students',
+    data
+  })
+}
+
+//获取宿舍列表
+export const getDormitories = data => {
+  return request({
+    method: 'POST',
+    url: '/web/dormitories/list',
+    data
+  })
+}
+
+//修改宿舍列表
+export const updateDormitory = data => {
+  return request({
+    method: 'PUT',
+    url: '/web/dormitory/' + data.id,
+    data
+  })
+}
+
+//批量新增宿舍
+export const addDormitories = data => {
+  return request({
+    method: 'POST',
+    url: '/web/dormitories',
+    data
+  })
+}
+
+//删除宿舍
+export const deleteDormitory = data => {
+  return request({
+    method: 'DELETE',
+    url: '/web/dormitory/' + data.id,
     data
   })
 }

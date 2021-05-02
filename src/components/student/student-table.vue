@@ -6,28 +6,14 @@
       @selection-change="selectStudent"
       border
       stripe
+      v-loading="loading"
     >
       <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="学号" prop="stuNo" sortable />
       <el-table-column align="center" label="姓名" prop="username" sortable />
-      <el-table-column
-        align="center"
-        label="学院"
-        prop="departmentName"
-        sortable
-      />
-      <el-table-column
-        align="center"
-        label="专业"
-        prop="aclass.majorName"
-        sortable
-      />
-      <el-table-column
-        align="center"
-        label="班级"
-        prop="aclass.classNo"
-        sortable
-      />
+      <el-table-column align="center" label="学院" prop="departmentName" sortable />
+      <el-table-column align="center" label="专业" prop="aclass.majorName" sortable />
+      <el-table-column align="center" label="班级" prop="aclass.classNo" sortable />
       <el-table-column
         :formatter="dormConvert"
         align="center"
@@ -79,14 +65,10 @@
       :page-size="curPageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
-    >
-    </el-pagination>
+    ></el-pagination>
 
     <!-- 学生信息 -->
-    <student-detail
-      :info="curStudentDetail"
-      :visible.sync="isShowStudentDetail"
-    />
+    <student-detail :info="curStudentDetail" :visible.sync="isShowStudentDetail" />
 
     <!-- 编辑学生信息 -->
     <edit-student
@@ -115,6 +97,7 @@ export default {
     curPageSize: Number,
     edit: Boolean,
     del: Boolean,
+    loading: Boolean,
   },
   data() {
     return {

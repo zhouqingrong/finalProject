@@ -5,38 +5,61 @@
       append-to-body
       :before-close="beforeClose"
       :close-on-click-modal="false"
-      :title="'修改' + curDetail.dormitory_name + '的信息'"
+      :title="'修改' + curDetail.roomName + '的信息'"
       :visible="visible"
       @update:visible="$emit('update:visible', $event)"
       width="500px"
     >
       <el-form :model="info" label-width="100px" ref="form">
-        <el-form-item label="序号" prop="dormitory_num">
-          <el-input :value="info.dormitory_num" disabled style="width: 200px" />
+        <el-form-item label="序号" prop="id">
+          <el-input :value="info.id" disabled style="width: 200px" />
         </el-form-item>
-        <el-form-item
-          label="社区"
-          prop="dormitory_community"
-          :rules="[{ required: true, message: '社区不能为空' }]"
-        >
-          <el-select
-            placeholder="选择社区"
-            size="medium"
-            style="width: 200px"
-            v-model="info.dormitory_community"
-          >
-            <el-option :value="1" label="1社区"></el-option>
-            <el-option :value="2" label="2社区"></el-option>
-            <el-option :value="3" label="3社区"></el-option>
-            <el-option :value="4" label="4社区"></el-option>
+        <el-form-item label="社区" prop="community" :rules="[{ required: true, message: '社区不能为空' }]">
+          <el-select placeholder="选择社区" size="medium" style="width: 200px" v-model="info.community">
+            <el-option
+              :key="item._id"
+              :label="item.name"
+              :value="item.name"
+              v-for="item in options.community"
+            />
           </el-select>
         </el-form-item>
         <el-form-item
-          :rules="[{ required: true, message: '宿舍不能为空' }]"
-          label="宿舍"
-          prop="dormitory_name"
+          label="楼栋"
+          prop="building"
+          :rules="[
+                { required: true, message: '楼栋不能为空' },
+              ]"
         >
-          <el-input style="width: 200px" v-model="info.dormitory_name" />
+          <el-select placeholder="请选择楼栋" size="medium" style="width: 130px" v-model="info.building">
+            <el-option
+              :key="item._id"
+              :label="item.name"
+              :value="item.name"
+              v-for="item in options.building"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item :rules="[{ required: true, message: '宿舍不能为空' }]" label="宿舍" prop="roomNo">
+          <el-input style="width: 200px" v-model="info.roomNo" />
+        </el-form-item>
+        <el-form-item
+          :rules="[{ required: true,message: '可住人数不能为空' },{
+            validator: checkCapacity
+          }]"
+          label="可住人数"
+          prop="capacity"
+        >
+          <!-- <el-input style="width: 200px" v-model.number="info.capacity" /> -->
+          <el-input-number
+            :min="0"
+            :max="10"
+            :step="1"
+            controls-position="right"
+            size="medium"
+            style="width: 100px;"
+            v-model.number="info.capacity"
+          />
         </el-form-item>
         <section class="flex-center">
           <el-button @click="save" type="primary">保存</el-button>
@@ -47,6 +70,7 @@
   </div>
 </template>
 <script>
+import { updateDormitory } from "@/api/superAdmin";
 export default {
   name: "edit-dormitory",
   components: {},
@@ -60,6 +84,40 @@ export default {
   data() {
     return {
       info: {},
+      options: {
+        community: [
+          {
+            _id: "1",
+            name: "1",
+          },
+          {
+            _id: "2",
+            name: "2",
+          },
+          {
+            _id: "3",
+            name: "3",
+          },
+          {
+            _id: "4",
+            name: "4",
+          },
+        ],
+        building: [
+          {
+            _id: 1,
+            name: "A",
+          },
+          {
+            _id: 2,
+            name: "B",
+          },
+          {
+            _id: 3,
+            name: "C",
+          },
+        ],
+      },
     };
   },
   computed: {},
@@ -75,6 +133,13 @@ export default {
   created() {},
   mounted() {},
   methods: {
+    //检查修改人数不得小于已入住人数
+    checkCapacity(rule, value, callback) {
+      if (value < this.info.students.length) {
+        callback(new Error("不得小于已入住人数"));
+      }
+      callback();
+    },
     beforeClose(done) {
       done && done();
     },
@@ -82,29 +147,28 @@ export default {
       this.$emit("update:visible", false);
       this.beforeClose();
     },
-    async save() {
-      try {
-        await this.$refs.form.validate();
-        const info = this.info;
-        const form = {
-          _id: info._id,
-          dormitory_name: info.dormitory_name,
-          dormitory_num: info.dormitory_num,
-          dormitory_community: info.dormitory_community,
-        };
-        // 掉修改学生信息接口
-        // this.request.post("/api/student/updateOneById", form).then((res) => {
-        //   if (!res.data.errcode) {
-        //     this.$alert("修改成功！", "提示", { type: "success" });
-        //     this.closeDialog();
-        //     this.$emit("update");
-        //   } else {
-        //     this.$alert(res.data.msg, "错误", { type: "error" });
-        //   }
-        // });
-      } catch (e) {
-        return false;
-      }
+    save() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const info = this.info;
+          const data = {
+            id: info.id,
+            community: info.community,
+            building: info.building,
+            roomNo: info.roomNo,
+          };
+          updateDormitory(data)
+            .then((res) => {
+              this.$message.success("修改成功");
+              this.$emit("update");
+              this.closeDialog();
+            })
+            .catch((err) => {
+              this.$message.error("修改失败");
+              console.log("宿舍修改失败err", err);
+            });
+        }
+      });
     },
   },
 };

@@ -10,51 +10,24 @@
     title="添加学生"
     width="500px"
   >
-    <el-form
-      :model="form"
-      :rules="rules"
-      label-width="120px"
-      ref="form"
-      status-icon
-    >
+    <el-form :model="form" :rules="rules" label-width="120px" ref="form" status-icon>
       <el-form-item label="学号：" prop="student_num">
-        <el-input
-          placeholder="请输入学号"
-          style="width: 200px"
-          v-model="form.student_num"
-        />
+        <el-input placeholder="请输入学号" style="width: 200px" v-model="form.student_num" />
       </el-form-item>
       <el-form-item label="姓名：" prop="student_name">
-        <el-input
-          placeholder="请输入姓名"
-          style="width: 200px"
-          v-model="form.student_name"
-        />
+        <el-input placeholder="请输入姓名" style="width: 200px" v-model="form.student_name" />
       </el-form-item>
       <el-form-item label="性别：" prop="student_sex">
-        <el-select
-          placeholder="全部"
-          size="medium"
-          style="width: 100px"
-          v-model="form.student_sex"
-        >
+        <el-select placeholder="全部" size="medium" style="width: 100px" v-model="form.student_sex">
           <el-option :value="1" label="男"></el-option>
           <el-option :value="2" label="女"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="班级：" prop="student_class">
-        <el-cascader
-          placeholder="请输入班级"
-          v-model="form.student_class"
-          :options="options"
-        ></el-cascader>
+        <el-cascader placeholder="请输入班级" v-model="form.student_class" :options="options"></el-cascader>
       </el-form-item>
       <el-form-item label="联系方式：" prop="student_phone">
-        <el-input
-          placeholder="请输入联系方式"
-          style="width: 200px"
-          v-model="form.student_phone"
-        />
+        <el-input placeholder="请输入联系方式" style="width: 200px" v-model="form.student_phone" />
       </el-form-item>
       <el-form-item label="地址：" prop="student_address">
         <el-input
@@ -65,11 +38,7 @@
         />
       </el-form-item>
       <el-form-item label="紧急联系人：" prop="student_urgentPhone">
-        <el-input
-          placeholder="请输入紧急联系人"
-          style="width: 200px"
-          v-model="form.student_urgentPhone"
-        />
+        <el-input placeholder="请输入紧急联系人" style="width: 200px" v-model="form.student_urgentPhone" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -193,46 +162,36 @@ export default {
     },
     //添加学生
     addStudent() {
-      let data = [
-        {
-          address: this.form.student_address,
-          classId: this.form.student_class[2], //班级（级联选择）
-          phone: this.form.student_phone,
-          role: 1, //默认都是普通学生
-          sex: this.form.student_sex,
-          stuNo: this.form.student_num,
-          urgentPhone: this.form.student_urgentPhone,
-          username: this.form.student_name,
-        },
-      ];
-      // 带封装数据
-      addStudents(data)
-        .then((res) => {
-          this.$message.success("学生添加成功");
-          console.log("添加学生res：", res);
-          // 关闭表单
-          this.closeDialog();
-          // 刷新
-          this.$emit("update");
-        })
-        .catch((err) => {
-          console.log("添加学生err:", err);
-          this.$message.error("添加失败");
-        });
-      // try {
-      //   await this.$refs.form.validate();
-      //   this.request.post("/api/student/insert", this.form).then((res) => {
-      //     if (!res.data.errcode) {
-      //       this.$alert("添加成功！", "提示", { type: "success" });
-      //       this.closeDialog();
-      //       this.$emit("update");
-      //     } else {
-      //       this.$alert(res.data.msg, "错误", { type: "error" });
-      //     }
-      //   });
-      // } catch (e) {
-      //   return false;
-      // }
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          let data = [
+            {
+              address: this.form.student_address,
+              classId: this.form.student_class[2], //班级（级联选择）
+              phone: this.form.student_phone,
+              role: 1, //默认都是普通学生
+              sex: this.form.student_sex,
+              stuNo: this.form.student_num,
+              urgentPhone: this.form.student_urgentPhone,
+              username: this.form.student_name,
+            },
+          ];
+          // 带封装数据
+          addStudents(data)
+            .then((res) => {
+              this.$message.success("学生添加成功");
+              console.log("添加学生res：", res);
+              // 关闭表单
+              this.closeDialog();
+              // 刷新
+              this.$emit("update");
+            })
+            .catch((err) => {
+              console.log("添加学生err:", err);
+              this.$message.error("添加失败");
+            });
+        }
+      });
     },
   },
 };

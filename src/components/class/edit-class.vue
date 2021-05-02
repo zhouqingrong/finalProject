@@ -28,23 +28,16 @@
             <el-option :value="1" label="信电学院"></el-option>
             <el-option :value="2" label="文法学院"></el-option>
           </el-select>
-        </el-form-item> -->
+        </el-form-item>-->
         <el-form-item
           :rules="[{ required: true, message: '学院专业不能为空' }]"
           label="学院专业"
           prop="departmentMajor"
         >
-          <el-cascader
-            v-model="info.departmentMajor"
-            :options="options"
-          ></el-cascader>
+          <el-cascader v-model="info.departmentMajor" :options="options"></el-cascader>
           <!-- <el-input style="width: 200px" v-model="info.majorName" /> -->
         </el-form-item>
-        <el-form-item
-          :rules="[{ required: true, message: '班级不能为空' }]"
-          label="班级"
-          prop="classNo"
-        >
+        <el-form-item :rules="[{ required: true, message: '班级不能为空' }]" label="班级" prop="classNo">
           <el-input style="width: 200px" v-model="info.classNo" />
         </el-form-item>
         <section class="flex-center">
@@ -96,43 +89,32 @@ export default {
     },
     // 修改 调接口
 
-    async save() {
-      try {
-        await this.$refs.form.validate();
-        const info = this.info;
-        const data = {
-          id: info.id,
-          classNo: info.classNo,
-          departmentName: info.departmentMajor[0],
-          majorName: info.departmentMajor[1],
-        };
-        updateClass(data)
-          .then((res) => {
-            console.log("编辑班级res", res);
-            this.$message.success("修改班级成功");
-            // 关闭dialog
-            this.closeDialog();
-            //更新
-            this.$emit("update");
-          })
-          .catch((err) => {
-            this.$message.error("修改班级失败");
-            this.info = JSON.parse(JSON.stringify(this.curDetail));
-            console.log("编辑班级err", err);
-          });
-        // 掉修改学生信息接口
-        // this.request.post("/api/student/updateOneById", form).then((res) => {
-        //   if (!res.data.errcode) {
-        //     this.$alert("修改成功！", "提示", { type: "success" });
-        //     this.closeDialog();
-        //     this.$emit("update");
-        //   } else {
-        //     this.$alert(res.data.msg, "错误", { type: "error" });
-        //   }
-        // });
-      } catch (e) {
-        return false;
-      }
+    save() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const info = this.info;
+          const data = {
+            id: info.id,
+            classNo: info.classNo,
+            departmentName: info.departmentMajor[0],
+            majorName: info.departmentMajor[1],
+          };
+          updateClass(data)
+            .then((res) => {
+              console.log("编辑班级res", res);
+              this.$message.success("修改班级成功");
+              // 关闭dialog
+              this.closeDialog();
+              //更新
+              this.$emit("update");
+            })
+            .catch((err) => {
+              this.$message.error("修改班级失败");
+              this.info = JSON.parse(JSON.stringify(this.curDetail));
+              console.log("编辑班级err", err);
+            });
+        }
+      });
     },
   },
 };

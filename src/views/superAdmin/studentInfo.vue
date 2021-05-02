@@ -16,7 +16,7 @@
                 v-model="searchForm.studentNoKeyword"
               />
             </el-form-item>
-            <el-form-item label="">
+            <el-form-item label>
               <el-input
                 clearable
                 placeholder="按姓名搜索"
@@ -34,21 +34,13 @@
               ></el-cascader>
             </el-form-item>
             <el-form-item>
-              <el-button
-                native-type="submit"
-                size="medium"
-                type="primary"
-                @click="getData()"
-                >搜索</el-button
-              >
+              <el-button native-type="submit" size="medium" type="primary" @click="getData()">搜索</el-button>
             </el-form-item>
           </el-form>
         </div>
         <!-- 新增学生按钮 -->
         <div style="margin-left: auto !important">
-          <el-button size="medium" type="info" @click="isShowAddDialog = true"
-            >新增学生</el-button
-          >
+          <el-button size="medium" type="info" @click="isShowAddDialog = true">新增学生</el-button>
           <el-button size="medium" type="danger">批量删除学生</el-button>
           <el-button size="medium" type="primary">批量导入学生</el-button>
         </div>
@@ -64,6 +56,7 @@
         :list="studentData"
         :total="paging.total"
         :cur-pageSize="paging.pageSize"
+        :loading="loading"
         @select:students="onSelectStudents"
         @current-change="curPageChange"
         @size-change="curPageSizeChange"
@@ -100,7 +93,7 @@
             >
           </div>
         </template>
-      </el-dialog> -->
+      </el-dialog>-->
 
       <!-- 新增学生 -->
       <add-student :visible.sync="isShowAddDialog" @update="getData" />
@@ -122,6 +115,7 @@ export default {
   props: {},
   data() {
     return {
+      loading: false,
       paging: {
         pageNo: 1,
         total: 1,
@@ -189,15 +183,18 @@ export default {
         studentNo: this.searchForm.studentNoKeyword,
         username: this.searchForm.studentNameKeyword,
       };
+      this.loading = true;
       getStudents(data)
         .then((res) => {
           this.studentData = res.data.data.students;
           this.paging.total = res.data.data.pageInfo.totalCount;
           console.log("获取学生数据res", res);
+          this.loading = false;
         })
         .catch((err) => {
           this.$message.error("获取学生失败");
           console.log("获取学生数据err", err);
+          this.loading = false;
         });
     },
     // 选择学生

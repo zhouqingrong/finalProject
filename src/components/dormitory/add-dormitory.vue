@@ -13,24 +13,21 @@
       <el-form :model="form" inline ref="form">
         <div class="dialog-container">
           <!-- class="dorm-item" -->
-          <section
-            :key="i.dormitory_num"
-            v-for="(i, index) in form.dormitories"
-          >
+          <section :key="i.dormitory_id" v-for="(i, index) in form.dormitories">
             <!-- :prop="'dorms.' + index + '.building_num'" -->
             <el-form-item
-              :prop="'i.' + index + '.dormitory_commmunity'"
+              :prop="'dormitories.' + index + '.dormitory_community'"
               :rules="[
                 { required: true, message: '请选择社区', trigger: 'change' },
               ]"
-              label=""
+              label
               label-width="90px"
             >
               <el-select
                 placeholder="请选择社区"
                 size="medium"
                 style="width: 130px"
-                v-model="i.dormitory_commmunity"
+                v-model="i.dormitory_community"
               >
                 <el-option
                   :key="item._id"
@@ -41,20 +38,64 @@
               </el-select>
             </el-form-item>
             <el-form-item
-              :prop="'i.' + index + '.dormitory_name'"
+              :prop="'dormitories.' + index + '.dormitory_building'"
               :rules="[
-                { required: true, message: '请输入宿舍' }, //可以限制数字、4位
-                // { validator: checkUniqueNum },//需要校验是不是已存在
+                { required: true, message: '请选择楼栋', trigger: 'change' },
               ]"
-              label="宿舍"
+              label
+              label-width="90px"
+            >
+              <el-select
+                placeholder="请选择楼栋"
+                size="medium"
+                style="width: 130px"
+                v-model="i.dormitory_building"
+              >
+                <el-option
+                  :key="item._id"
+                  :label="item.name"
+                  :value="item.name"
+                  v-for="item in options.building"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item
+              :prop="'dormitories.' + index + '.dormitory_num'"
+              :rules="[
+                { required: true, message: '请输入门牌号' }, //可以限制数字、4位
+                {pattern: /^[1-9][0-9]{2,3}/, message: '请输入正确门牌号'}
+            ]"
+              label="门牌号"
             >
               <el-input
-                placeholder="例如：1#B510"
+                placeholder="例如：510"
                 size="medium"
                 style="width: 120px"
-                v-model="i.dormitory_name"
+                v-model.number="i.dormitory_num"
               />
             </el-form-item>
+            <el-form-item
+              :prop="'dormitories.' + index + '.dormitory_capacity'"
+              :rules="[
+                { required: true, message: '请输入可住人数' }, 
+              ]"
+              label="人数"
+            >
+              <el-input-number
+                :min="0"
+                :max="10"
+                :step="1"
+                controls-position="right"
+                size="medium"
+                style="width: 100px;"
+                v-model.number="i.dormitory_capacity"
+              />
+            </el-form-item>
+            <!-- <el-form-item align="center" label="宿舍号">
+              <template
+                #default="scope"
+              >{{getDormNum(scope.row.dormitory_community,scope.row.dormitory_building,scope.row.dormitory_num)}}</template>
+            </el-form-item>-->
 
             <el-form-item>
               <el-button
@@ -127,7 +168,7 @@
               >一键设置</el-button
             >
           </el-form-item>
-        </el-form> -->
+        </el-form>-->
         <!-- 一键设置结束 -->
         <section class="flex-center">
           <el-button @click="submit" type="primary">确认添加</el-button>
@@ -150,17 +191,21 @@
           <el-table-column align="center" class-name="color-danger" label="错误原因" prop="errors"/>
         </el-table>
       </div>
-    </el-dialog> -->
+    </el-dialog>-->
   </div>
 </template>
 
 <script>
 // import {getAllBuildings} from "@/api/building";
-
+import { addDormitories } from "@/api/superAdmin";
 class Item {
   constructor() {
-    this.dormitory_num = "";
+    //随机生成 用来绑定v-for的key
+    this.dormitory_id = "" + Math.random() * Date.now();
     this.dormitory_community = "";
+    this.dormitory_building = "";
+    this.dormitory_num = "";
+    this.dormitory_capacity = "";
     this.dormitory_name = "";
     // this.class_num = "" + Math.random() * Date.now();
   }
@@ -180,19 +225,33 @@ export default {
         community: [
           {
             _id: "1",
-            name: "1社区",
+            name: "1",
           },
           {
             _id: "2",
-            name: "2社区",
+            name: "2",
           },
           {
             _id: "3",
-            name: "3社区",
+            name: "3",
           },
           {
             _id: "4",
-            name: "4社区",
+            name: "4",
+          },
+        ],
+        building: [
+          {
+            _id: 1,
+            name: "A",
+          },
+          {
+            _id: 2,
+            name: "B",
+          },
+          {
+            _id: 3,
+            name: "C",
           },
         ],
       },
@@ -207,27 +266,34 @@ export default {
     };
   },
   methods: {
+    //检查人数是否合法
+    checkDormNum(rule, value, callback) {
+      if (!Number.isInteger(value) || value < 0) {
+        callback(new Error("请输入正确数字"));
+      }
+      callback();
+    },
     add(index) {
-      this.form.class.splice(index + 1, 0, new Item());
+      this.form.dormitories.splice(index + 1, 0, new Item());
       // this.form.dorms.push(new DormItem())
     },
     del(index) {
-      this.form.class.splice(index, 1);
+      this.form.dormitories.splice(index, 1);
     },
     closeDialog() {
       this.$emit("update:visible", false);
       this.beforeClose();
     },
     beforeClose(done) {
-      this.form.class = [new Item()];
+      this.form.dormitories = [new Item()];
       done && done();
     },
-    // getDormNum(building_num, house_num) {
-    //   if (!building_num || !house_num) {
-    //     return null;
-    //   }
-    //   return building_num + "#" + house_num;
-    // },
+    getDormNum(community, building, number) {
+      if (!community || !building || !number) {
+        return null;
+      }
+      return community + "#" + building + number;
+    },
     // checkUniqueNum(rule, value, callback) {
     //   const curIndex = rule.field.split(".")[1] * 1;
     //   const curDorm = this.form.dorms[curIndex];
@@ -248,41 +314,33 @@ export default {
     //     callback();
     //   }
     // },
-    async submit() {
-      try {
-        await this.$refs.form.validate();
-        this.request.post("/api/dorm/insertMany", this.form).then((res) => {
-          if (!res.data.errcode) {
-            this.$alert("添加成功！", "提示", { type: "success" });
-            this.closeDialog();
-            this.$emit("update");
-          } else {
-            this.$message.error("添加失败，请查看！");
-            this.isShowErrDialog = true;
-            this.errList = res.data.errorDorms.map((item) => {
-              return {
-                errors: item.errors.map((item) => item.msg).join(";"),
-                ...item.dorm,
-              };
+    submit() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          let data = [];
+          let dorms = this.form.dormitories;
+          for (let i = 0; i < dorms.length; i++) {
+            data.push({
+              community: dorms[i].dormitory_community,
+              building: dorms[i].dormitory_building,
+              roomNo: dorms[i].dormitory_num,
+              capacity: dorms[i].dormitory_capacity,
             });
           }
-        });
-      } catch (e) {
-        return false;
-      }
-    },
-    quickSet() {
-      this.form.class.forEach((item) => {
-        if (this.quickForm.class_department_active) {
-          item.class_department = this.quickForm.class_department;
-        }
-        if (this.quickForm.class_major_active) {
-          item.class_major = this.quickForm.class_major;
+          addDormitories(data)
+            .then((res) => {
+              this.$emit("update");
+              this.closeDialog();
+              this.$message.success("添加成功");
+            })
+            .catch((err) => {
+              this.$message.error("添加失败");
+            });
         }
       });
     },
   },
-  async mounted() {
+  mounted() {
     // this.options.buildings = (await getAllBuildings()).data.data;
   },
 };

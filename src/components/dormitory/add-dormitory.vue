@@ -102,23 +102,23 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item prop="class_marjor_active">
-            <el-checkbox v-model="quickForm.class_marjor_active"
+          <el-form-item prop="class_major_active">
+            <el-checkbox v-model="quickForm.class_major_active"
               >专业</el-checkbox
             >
           </el-form-item>
-          <el-form-item prop="class_marjor">
+          <el-form-item prop="class_major">
             <el-select
               placeholder="请选择专业"
               size="small"
               style="width: 130px"
-              v-model="quickForm.class_marjor"
+              v-model="quickForm.class_major"
             >
               <el-option
                 :key="item._id"
-                :label="item.marjor"
-                :value="item.marjor"
-                v-for="item in options.marjors"
+                :label="item.major"
+                :value="item.major"
+                v-for="item in options.majors"
               />
             </el-select>
           </el-form-item>
@@ -201,8 +201,8 @@ export default {
       quickForm: {
         class_department_active: true,
         class_department: "",
-        class_marjor_active: true,
-        class_marjor: "",
+        class_major_active: true,
+        class_major: "",
       },
     };
   },
@@ -276,8 +276,8 @@ export default {
         if (this.quickForm.class_department_active) {
           item.class_department = this.quickForm.class_department;
         }
-        if (this.quickForm.class_marjor_active) {
-          item.class_marjor = this.quickForm.class_marjor;
+        if (this.quickForm.class_major_active) {
+          item.class_major = this.quickForm.class_major;
         }
       });
     },

@@ -1,5 +1,7 @@
 <template>
   <div class="AdminContainer">
+    <!-- 面包屑 -->
+    <Breadcrumb :path="path" />
     <section class="offset-fotm-item search">
       <div>
         <!-- 搜索栏 -->
@@ -55,9 +57,11 @@
 <script>
 import AdminTable from "@/components/admin/admin-table.vue";
 import AddAdmin from "../../components/admin/add-admin.vue";
+import Breadcrumb from "@/components/breadcrumb/index.vue";
+
 export default {
   name: "adminInfo",
-  components: { AdminTable, AddAdmin },
+  components: { AdminTable, AddAdmin, Breadcrumb },
   props: {},
   data() {
     return {
@@ -87,6 +91,11 @@ export default {
           admin_name: "吴迪",
         },
       ],
+      path: {
+        //面包屑路径
+        path: "/adminInfo",
+        name: "管理员管理",
+      },
     };
   },
   computed: {},

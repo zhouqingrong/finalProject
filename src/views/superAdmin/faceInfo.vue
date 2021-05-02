@@ -1,5 +1,7 @@
 <template>
   <div class="FaceInfoContainer">
+    <!-- 面包屑 -->
+    <Breadcrumb :path="path" />
     <section class="offset-fotm-item search">
       <div>
         <!-- 人脸图库搜索栏 -->
@@ -72,11 +74,11 @@
 </template>
 <script>
 import FaceTable from "@/components/face/face-table.vue";
-// import AddClass from "../../components/class/add-class.vue";
+import Breadcrumb from "@/components/breadcrumb/index.vue";
 
 export default {
   name: "classInfo",
-  components: { FaceTable },
+  components: { FaceTable, Breadcrumb },
   props: {},
   data() {
     return {
@@ -147,6 +149,10 @@ export default {
           ],
         },
       ],
+      path: {
+        path: "/classInfo",
+        name: "人脸图库",
+      }, //面包屑路径
     };
   },
   computed: {},

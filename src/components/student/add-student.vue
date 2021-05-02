@@ -42,38 +42,14 @@
           <el-option :value="2" label="女"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="学院：" prop="student_department">
-        <el-select
-          placeholder="请选择学院"
-          size="medium"
-          style="width: 200px"
-          v-model="form.student_department"
-        >
-          <el-option
-            :key="item.id"
-            :label="item.departmentName"
-            :value="item.id"
-            v-for="item in departments"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item label="班级：" prop="student_class">
-        <el-input
+        <el-cascader
           placeholder="请输入班级"
-          style="width: 200px"
-          controls-position="right"
           v-model="form.student_class"
-        />
+          :options="options"
+        ></el-cascader>
       </el-form-item>
-      <el-form-item label="宿舍：" prop="student_dormitory ">
-        <el-input
-          placeholder="请输入宿舍"
-          style="width: 200px"
-          controls-position="right"
-          v-model="form.student_dormitory"
-        />
-      </el-form-item>
-      <el-form-item label="联系方式：" prop="student_phone ">
+      <el-form-item label="联系方式：" prop="student_phone">
         <el-input
           placeholder="请输入联系方式"
           style="width: 200px"
@@ -95,17 +71,10 @@
           v-model="form.student_urgentPhone"
         />
       </el-form-item>
-      <!-- <el-form-item label="辅导员：" prop="student_teacher">
-        <el-input
-          placeholder="请输入辅导员："
-          style="width: 200px"
-          v-model="form.student_teacher"
-        />
-      </el-form-item> -->
     </el-form>
     <template #footer>
       <div class="text-center">
-        <el-button @click="submit" type="primary">提交</el-button>
+        <el-button @click="addStudent" type="primary">提交</el-button>
         <el-button @click="closeDialog">取消</el-button>
       </div>
     </template>
@@ -117,17 +86,16 @@ import {
   getDepartments,
   getClasses,
   getDormitories,
+  addStudents,
+  schoolAll,
 } from "@/api/superAdmin.js";
 const initForm = function () {
   return {
     student_num: "",
     student_name: "",
     student_sex: 1,
-    student_department: "",
-    student_class: "",
-    student_dormitory: "",
+    student_class: [],
     class_id: 0, //用于后端传值
-    dormitory_id: 0, //用于后端传值
     student_address: "",
     student_phone: "",
     student_urgentPhone: "",
@@ -139,57 +107,21 @@ export default {
     visible: Boolean,
   },
   data() {
+    // 班级校验规则
     var checkClass = (rule, value, callback) => {
       console.log("====", value);
-      if (value === "") {
+      if (value === []) {
         callback(new Error("请输入班级"));
         return;
       }
-      // 这里是按班级名完全正确进行查询校验
-      let data = {};
-      data["className"] = value;
-      getClasses(data)
-        .then((res) => {
-          if (res.data.data.classes.length == 0) {
-            callback(new Error("无此班级"));
-          } else {
-            this.form.class_id = res.data.data.classes[0].id;
-            callback();
-          }
-          console.log("获取班级res", res);
-        })
-        .catch((err) => {
-          callback(new Error("无此班级"));
-        });
-    };
-    var checkDormitories = (rule, value, callback) => {
-      console.log("====", value);
-      if (value === "") {
-        callback(new Error("请输入宿舍"));
-        return;
-      }
-      // 这里是按宿舍名完全正确进行查询校验
-      let data = {};
-      data["roomName"] = value;
-      getDormitories(data)
-        .then((res) => {
-          if (res.data.data.dormitories.length == 0) {
-            callback(new Error("无此宿舍"));
-          } else {
-            this.form.dormitory_id = res.data.data.dormitories[0].id;
-            callback();
-          }
-          console.log("获取宿舍res", res);
-        })
-        .catch((err) => {
-          callback(new Error("无此宿舍"));
-        });
+      callback();
     };
     return {
       form: initForm(),
+      options: [],
       rules: {
         student_num: [
-          { required: true, message: "学号不能为空" },
+          { required: true, message: "学号不能为空", trigger: "blur" },
           {
             pattern: /[0|1|2|3|4|5|6|7|8|9]\d{8}$/,
             message: "请输入正确学号格式",
@@ -200,75 +132,110 @@ export default {
           { required: true, message: "班级不能为空" },
           { validator: checkClass, trigger: "blur" },
         ],
-        student_dormitory: [
-          { required: true, message: "宿舍不能为空" },
-          { validator: checkDormitories, trigger: "blur" },
-        ],
-        student_department: [{ required: true, message: "学院不能为空" }],
         student_urgentPhone: [
-          { required: true, message: "紧急联系人不能为空", trigger: "change" },
+          { required: true, message: "紧急联系人不能为空", trigger: "blur" },
           {
             pattern: /[0|1|2|3|4|5|6|7|8|9]\d{10}$/,
             message: "请输入正确电话格式",
           },
         ],
         student_phone: [
-          { required: true, message: "联系方式不能为空", trigger: "change" },
+          { required: true, message: "联系方式不能为空", trigger: "blur" },
           {
             pattern: /[0|1|2|3|4|5|6|7|8|9]\d{10}$/,
             message: "请输入正确电话格式",
           },
         ],
       },
-      departments: [],
+      departments: [], //用于存放后端查询得到的学院
     };
   },
-  created() {
-    this.initDepartment();
+  created() {},
+  mounted() {
+    this.initOptions();
   },
-  mounted() {},
+
   methods: {
-    //校验班级
-    // 获取学院
-    initDepartment() {
-      let data = {};
-      data.pageNo = 1;
-      data.pageSize = 50;
-      getDepartments(data)
+    // 搜索的级联班级数据
+    initOptions() {
+      schoolAll()
         .then((res) => {
-          console.log("获取学院", res);
-          this.departments = res.data.data.departments;
+          this.options = res.data.data.options;
+          console.log("搜索的级联班级数据res", res);
         })
         .catch((err) => {
-          console.log("获取学院err", err);
-          this.$message.error("获取失败");
+          console.log("搜索的级联班级数据err", err);
         });
     },
+    //校验班级
+    // // 获取学院
+    // initDepartment() {
+    //   let data = {};
+    //   data.pageNo = 1;
+    //   data.pageSize = 50;
+    //   getDepartments(data)
+    //     .then((res) => {
+    //       console.log("获取学院", res);
+    //       this.departments = res.data.data.departments;
+    //     })
+    //     .catch((err) => {
+    //       console.log("获取学院err", err);
+    //       this.$message.error("获取失败");
+    //     });
+    // },
+    // 关闭窗口，给父组件传值
     closeDialog() {
       this.$emit("update:visible", false);
     },
+    // dialog关闭回调
     onClose() {
       this.form = initForm();
     },
-    async submit() {
-      try {
-        await this.$refs.form.validate();
-        this.request.post("/api/student/insert", this.form).then((res) => {
-          if (!res.data.errcode) {
-            this.$alert("添加成功！", "提示", { type: "success" });
-            this.closeDialog();
-            this.$emit("update");
-          } else {
-            this.$alert(res.data.msg, "错误", { type: "error" });
-          }
+    //添加学生
+    addStudent() {
+      let data = [
+        {
+          address: this.form.student_address,
+          classId: this.form.student_class[2], //班级（级联选择）
+          phone: this.form.student_phone,
+          role: 1, //默认都是普通学生
+          sex: this.form.student_sex,
+          stuNo: this.form.student_num,
+          urgentPhone: this.form.student_urgentPhone,
+          username: this.form.student_name,
+        },
+      ];
+      // 带封装数据
+      addStudents(data)
+        .then((res) => {
+          this.$message.success("学生添加成功");
+          console.log("添加学生res：", res);
+          // 关闭表单
+          this.closeDialog();
+          // 刷新
+          this.$emit("update");
+        })
+        .catch((err) => {
+          console.log("添加学生err:", err);
+          this.$message.error("添加失败");
         });
-      } catch (e) {
-        return false;
-      }
+      // try {
+      //   await this.$refs.form.validate();
+      //   this.request.post("/api/student/insert", this.form).then((res) => {
+      //     if (!res.data.errcode) {
+      //       this.$alert("添加成功！", "提示", { type: "success" });
+      //       this.closeDialog();
+      //       this.$emit("update");
+      //     } else {
+      //       this.$alert(res.data.msg, "错误", { type: "error" });
+      //     }
+      //   });
+      // } catch (e) {
+      //   return false;
+      // }
     },
   },
 };
 </script>
-
 <style scoped>
 </style>

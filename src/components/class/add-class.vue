@@ -12,18 +12,25 @@
     >
       <el-form :model="form" inline ref="form">
         <div class="dialog-container">
-          <!-- class="dorm-item" -->
           <section :key="i.class_num" v-for="(i, index) in form.class">
-            <!-- :prop="'dorms.' + index + '.building_num'" -->
             <el-form-item
               :prop="'class.' + index + '.class_department'"
               :rules="[
-                { required: true, message: '请选择学院', trigger: 'change' },
+                {
+                  required: true,
+                  message: '请选择学院专业',
+                  trigger: 'change',
+                },
               ]"
-              label="学院"
+              label="学院专业"
               label-width="90px"
             >
-              <el-select
+              <el-cascader
+                v-model="i.class_department"
+                :options="options"
+              ></el-cascader>
+
+              <!-- <el-select
                 placeholder="请选择学院"
                 size="medium"
                 style="width: 130px"
@@ -35,32 +42,11 @@
                   :value="item.department"
                   v-for="item in options.departments"
                 />
-              </el-select>
+              </el-select> -->
             </el-form-item>
+
             <el-form-item
-              :prop="'class.' + index + '.class_marjor'"
-              :rules="[
-                { required: true, message: '请选择专业', trigger: 'change' },
-              ]"
-              label="专业"
-              label-width="90px"
-            >
-              <el-select
-                placeholder="请选择专业"
-                size="medium"
-                style="width: 130px"
-                v-model="i.class_marjor"
-              >
-                <el-option
-                  :key="item._id"
-                  :label="item.marjor"
-                  :value="item.marjor"
-                  v-for="item in options.marjors"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item
-              :prop="'class.' + index + '.name'"
+              :prop="'class.' + index + '.class_no'"
               :rules="[
                 { required: true, message: '请输入班级' }, //可以限制数字、4位
                 // { validator: checkUniqueNum },//需要校验是不是已存在
@@ -71,7 +57,7 @@
                 placeholder="例如：1702"
                 size="medium"
                 style="width: 120px"
-                v-model="i.class_name"
+                v-model="i.class_no"
               />
             </el-form-item>
 
@@ -108,43 +94,15 @@
           <el-form-item label="快速设置：" label-width="90px" />
           <el-form-item prop="class_department_active">
             <el-checkbox v-model="quickForm.class_department_active"
-              >学院</el-checkbox
+              >学院专业</el-checkbox
             >
           </el-form-item>
           <el-form-item prop="class_department">
-            <el-select
-              placeholder="请选择楼栋"
-              size="small"
-              style="width: 130px"
+            <el-cascader
               v-model="quickForm.class_department"
-            >
-              <el-option
-                :key="item._id"
-                :label="item.department"
-                :value="item.department"
-                v-for="item in options.departments"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item prop="class_marjor_active">
-            <el-checkbox v-model="quickForm.class_marjor_active"
-              >专业</el-checkbox
-            >
-          </el-form-item>
-          <el-form-item prop="class_marjor">
-            <el-select
-              placeholder="请选择专业"
-              size="small"
-              style="width: 130px"
-              v-model="quickForm.class_marjor"
-            >
-              <el-option
-                :key="item._id"
-                :label="item.marjor"
-                :value="item.marjor"
-                v-for="item in options.marjors"
-              />
-            </el-select>
+              :options="options"
+              @change="handleChange"
+            ></el-cascader>
           </el-form-item>
           <el-form-item>
             <el-button @click="quickSet" size="small" type="primary"
@@ -159,33 +117,16 @@
         </section>
       </template>
     </el-dialog>
-
-    <!-- <el-dialog :close-on-click-modal="false" :visible.sync="isShowErrDialog" title="错误信息" width="700px">
-      <div class="dialog-container">
-        <el-table :data="errList" border stripe>
-          <el-table-column align="center" label="楼栋号" prop="building_num"/>
-          <el-table-column align="center" label="门牌号" prop="house_num"/>
-          <el-table-column align="center" label="宿舍号">
-            <template #default="scope">
-              {{getDormNum(scope.row.building_num,scope.row.house_num)}}
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="容纳人数" prop="contain_count"/>
-          <el-table-column align="center" class-name="color-danger" label="错误原因" prop="errors"/>
-        </el-table>
-      </div>
-    </el-dialog> -->
   </div>
 </template>
 
 <script>
-// import {getAllBuildings} from "@/api/building";
-
+import { addClass } from "@/api/superAdmin.js";
+import { departmentMajors } from "@/utils/staticData.js";
 class Item {
   constructor() {
-    this.class_department = "";
-    this.class_marjor = "";
-    this.class_name = 1702;
+    this.class_department = [];
+    this.class_no = "";
     this.class_num = "" + Math.random() * Date.now();
   }
 }
@@ -197,46 +138,30 @@ export default {
   },
   data() {
     return {
+      value: "",
       form: {
         class: [new Item()],
       },
-      options: {
-        buildings: [],
-        departments: [
-          {
-            _id: "1",
-            department: "信电学院",
-          },
-          {
-            _id: "2",
-            department: "机械学院",
-          },
-        ],
-        marjors: [
-          {
-            id: 1,
-            marjor: "软件工程",
-          },
-          {
-            id: 2,
-            marjor: "自动化",
-          },
-        ],
-      },
+      options: departmentMajors, //学院专业
       isShowErrDialog: false,
       errList: [],
       quickForm: {
         class_department_active: true,
-        class_department: "",
-        class_marjor_active: true,
-        class_marjor: "",
+        class_department: [],
       },
     };
   },
   methods: {
+    // 改变学院专业级联
+    handleChange(value) {
+      console.log("改变学院专业级联", value);
+    },
+
+    // departmentChange(value) {
+    //   console.log("departmentChange==", value);
+    // },
     add(index) {
       this.form.class.splice(index + 1, 0, new Item());
-      // this.form.dorms.push(new DormItem())
     },
     del(index) {
       this.form.class.splice(index, 1);
@@ -275,36 +200,33 @@ export default {
     //     callback();
     //   }
     // },
-    async submit() {
-      try {
-        await this.$refs.form.validate();
-        this.request.post("/api/dorm/insertMany", this.form).then((res) => {
-          if (!res.data.errcode) {
-            this.$alert("添加成功！", "提示", { type: "success" });
-            this.closeDialog();
-            this.$emit("update");
-          } else {
-            this.$message.error("添加失败，请查看！");
-            this.isShowErrDialog = true;
-            this.errList = res.data.errorDorms.map((item) => {
-              return {
-                errors: item.errors.map((item) => item.msg).join(";"),
-                ...item.dorm,
-              };
-            });
-          }
+    submit() {
+      let data = [];
+      for (let i = 0; i < this.form.class.length; i++) {
+        data.push({
+          classNo: this.form.class[i].class_no, //1702
+          departmentName: this.form.class[i].class_department[0],
+          majorName: this.form.class[i].class_department[1],
         });
-      } catch (e) {
-        return false;
       }
+      addClass(data)
+        .then((res) => {
+          console.log("addClass的res", res);
+          this.$message.success("添加班级成功");
+          //关闭dialog
+          this.closeDialog();
+          //刷新
+          this.$emit("update");
+        })
+        .catch((err) => {
+          console.log("addClass的err", err);
+          this.$message.error("添加班级失败");
+        });
     },
     quickSet() {
       this.form.class.forEach((item) => {
         if (this.quickForm.class_department_active) {
           item.class_department = this.quickForm.class_department;
-        }
-        if (this.quickForm.class_marjor_active) {
-          item.class_marjor = this.quickForm.class_marjor;
         }
       });
     },

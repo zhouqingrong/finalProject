@@ -1,5 +1,7 @@
 <template>
   <div class="dormitoryInfoContainer">
+    <!-- 面包屑 -->
+    <Breadcrumb :path="path" />
     <section class="offset-fotm-item search">
       <div>
         <!-- 宿舍搜索栏 -->
@@ -55,10 +57,11 @@
 <script>
 import DormitoryTable from "@/components/dormitory/dormitory-table.vue";
 import AddDormitory from "../../components/dormitory/add-dormitory.vue";
+import Breadcrumb from "@/components/breadcrumb/index.vue";
 
 export default {
   name: "dormitoryInfo",
-  components: { DormitoryTable, AddDormitory },
+  components: { DormitoryTable, AddDormitory, Breadcrumb },
   props: {},
   data() {
     return {
@@ -85,6 +88,10 @@ export default {
         },
       ],
       selected: [],
+      path: {
+        path: "/dormitoryInfo",
+        name: "宿舍管理",
+      }, //面包屑路径
     };
   },
   computed: {},

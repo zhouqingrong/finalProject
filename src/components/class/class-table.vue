@@ -3,26 +3,21 @@
     <!-- 班级表格 -->
     <el-table
       :data="list"
-      :default-sort="{ prop: 'class_num', order: 'ascending' }"
+      :default-sort="{ prop: 'id', order: 'ascending' }"
       @selection-change="selected"
       border
       stripe
     >
-      <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="序号" prop="class_num" sortable />
+      <!-- <el-table-column align="center" type="selection" width="55" /> -->
+      <el-table-column align="center" label="序号" prop="id" sortable />
       <el-table-column
         align="center"
         label="学院"
-        prop="class_department"
+        prop="departmentName"
         sortable
       />
-      <el-table-column
-        align="center"
-        label="专业"
-        prop="class_marjor"
-        sortable
-      />
-      <el-table-column align="center" label="班级" prop="class_name" sortable />
+      <el-table-column align="center" label="专业" prop="majorName" sortable />
+      <el-table-column align="center" label="班级" prop="classNo" sortable />
       <el-table-column align="center" label="操作">
         <template #default="scope">
           <el-tooltip content="查看/编辑信息" v-if="edit">
@@ -36,7 +31,7 @@
           </el-tooltip>
           <el-tooltip content="删除" v-if="del">
             <el-button
-              @click="deleteClass(scope.row)"
+              @click="showDeleteClass(scope.row)"
               circle
               icon="el-icon-delete font-size-16"
               plain
@@ -48,16 +43,18 @@
       </el-table-column>
     </el-table>
     <!-- 分页信息 -->
-    <!-- <el-pagination
-      :current-page="curPage"
-      :total="total"
+    <el-pagination
+      class="pagination"
+      @size-change="$emit('size-change', $event)"
       @current-change="$emit('current-change', $event)"
-      background
-      class="margin-top-20"
-      layout="total, prev, pager, next"
-      style="text-align: right"
+      :current-page="curPage"
+      :page-sizes="[5, 10, 20, 50]"
+      :page-size="curPageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
     >
-    </el-pagination> -->
+    </el-pagination>
+
     <!--  编辑/查看-->
     <edit-class
       :curDetail.sync="curDetail"
@@ -68,6 +65,7 @@
 </template>
 <script>
 import EditClass from "@/components/class/edit-class"; //编辑
+import { deleteClass } from "@/api/superAdmin.js";
 export default {
   name: "class-table",
   components: { EditClass },
@@ -77,7 +75,8 @@ export default {
       defualt: () => [],
     },
     total: Number,
-    curPage: Number,
+    curPage: Number, //当前是第几页
+    curPageSize: Number, //当前每页多少条
     edit: Boolean,
     del: Boolean,
   },
@@ -100,23 +99,24 @@ export default {
     showModifyClass(row) {
       console.log("修改班级信息row：", row);
       this.curDetail = row;
+      this.curDetail["departmentMajor"] = [row.departmentName, row.majorName];
       this.isShowModify = true;
     },
     // 删除班级
-    deleteClass(row) {
+    showDeleteClass(row) {
       console.log("删除改行信息row", row);
-      this.$confirm("此操作将永久删除该学生且无法恢复，是否继续？", "提示", {
+      this.$confirm("此操作将永久删除该班级且无法恢复，是否继续？", "提示", {
         type: "warning",
       }).then(() => {
-        this.request
-          .post("/api/student/removeOneById", { _id: row._id })
+        deleteClass(row.id)
           .then((res) => {
-            if (!res.data.errcode) {
-              this.$alert("删除成功！", "提示", { type: "success" });
-              this.$emit("update");
-            } else {
-              this.$alert(res.data.msg, "错误", { type: "error" });
-            }
+            console.log("删除班级class-res", res);
+            this.$message.success("删除班级成功");
+            this.$emit("update");
+          })
+          .catch((err) => {
+            console.log("删除班级class-err", err);
+            this.$message.error("删除班级失败");
           });
       });
     },
@@ -124,4 +124,7 @@ export default {
 };
 </script>
 <style scoped>
+.pagination {
+  margin: 30px auto;
+}
 </style>

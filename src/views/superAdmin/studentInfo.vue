@@ -1,5 +1,7 @@
 <template>
   <div class="StudentConatainer">
+    <!-- 面包屑 -->
+    <Breadcrumb :path="path" />
     <div class="page-container">
       <section class="offset-fotm-item search">
         <div>
@@ -8,43 +10,35 @@
             <el-form-item label="搜索">
               <el-input
                 clearable
-                placeholder="按学号、姓名搜索"
+                placeholder="按学号搜索"
                 prefix-icon="el-icon-search"
                 size="medium"
-                v-model="searchForm.keyword"
+                v-model="searchForm.studentNoKeyword"
               />
             </el-form-item>
-            <el-form-item label="性别">
-              <el-select
-                placeholder="全部"
-                size="medium"
-                style="width: 100px"
-                v-model="searchForm.sex"
-              >
-                <el-option :value="0" label="全部"></el-option>
-                <el-option :value="1" label="男"></el-option>
-                <el-option :value="2" label="女"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="宿舍号">
+            <el-form-item label="">
               <el-input
                 clearable
-                placeholder="例：8#604"
+                placeholder="按姓名搜索"
                 prefix-icon="el-icon-search"
                 size="medium"
-                style="width: 180px"
-                v-model="searchForm.dorm_num"
+                v-model="searchForm.studentNameKeyword"
               />
             </el-form-item>
             <el-form-item label="班级">
               <el-cascader
+                clearable
                 v-model="searchForm.class"
                 :options="options"
                 @change="handleChange"
               ></el-cascader>
             </el-form-item>
             <el-form-item>
-              <el-button native-type="submit" size="medium" type="primary"
+              <el-button
+                native-type="submit"
+                size="medium"
+                type="primary"
+                @click="getData()"
                 >搜索</el-button
               >
             </el-form-item>
@@ -66,10 +60,14 @@
       @update="getData"
       -->
       <student-table
-        :cur-page="paging.current"
+        :cur-page="paging.pageNo"
         :list="studentData"
         :total="paging.total"
+        :cur-pageSize="paging.pageSize"
         @select:students="onSelectStudents"
+        @current-change="curPageChange"
+        @size-change="curPageSizeChange"
+        @update="getData"
         edit
         del
         class="margin-top-20 width-full"
@@ -105,7 +103,7 @@
       </el-dialog> -->
 
       <!-- 新增学生 -->
-      <add-student :visible.sync="isShowAddDialog" />
+      <add-student :visible.sync="isShowAddDialog" @update="getData" />
 
       <!-- 批量导入学生 -->
       <!-- <bulk-import-students :visible.sync="isShowBulkImport" /> -->
@@ -114,96 +112,32 @@
 </template>
 <script>
 import StudentTable from "@/components/student/student-table.vue";
-import AddStudent from "@/components/student/add-student";
+import AddStudent from "@/components/student/add-student.vue";
+import Breadcrumb from "@/components/breadcrumb/index.vue";
+import { schoolAll, getStudents } from "@/api/superAdmin.js";
 // import BulkImportStudents from "@/components/student/bulk-import-students";
 export default {
   name: "studentInfo",
-  components: { StudentTable, AddStudent },
+  components: { StudentTable, AddStudent, Breadcrumb },
   props: {},
   data() {
     return {
       paging: {
-        current: 1,
+        pageNo: 1,
         total: 1,
-        pageCount: 1,
+        pageSize: 10,
       },
       searchForm: {
-        keyword: "",
-        sex: 0,
-        reside_status: 0,
-        dorm_num: "",
+        studentNameKeyword: "",
+        studentNoKeyword: "",
         class: [],
       },
-      options: [
-        {
-          value: "xindian",
-          label: "信电学院",
-          children: [
-            {
-              value: "rjgc",
-              label: "软件工程",
-              children: [
-                {
-                  value: "1701",
-                  label: "1701",
-                },
-                {
-                  value: "1702",
-                  label: "1702",
-                },
-                {
-                  value: "1703",
-                  label: "1703",
-                },
-                {
-                  value: "1801",
-                  label: "1801",
-                },
-              ],
-            },
-            {
-              value: "zdh",
-              label: "自动化",
-              children: [
-                {
-                  value: "1701",
-                  label: "1701",
-                },
-                {
-                  value: "1702",
-                  label: "1702",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      studentData: [
-        {
-          student_num: "1",
-          student_name: "张三",
-          student_department: "信电学院",
-          student_class: "软件1702",
-          dorm_num: 1,
-          student_phone: "112",
-          student_address: "河北省邯郸市",
-          student_sex: 1,
-          student_urgentPhone: "110",
-          student_teacher: "吴迪",
-        },
-        {
-          student_num: "2",
-          student_name: "张三",
-          student_department: "信电学院",
-          student_class: "软件1702",
-          dorm_num: 1,
-          student_phone: "112",
-          student_address: "河北省邯郸市",
-          student_sex: 1,
-          student_urgentPhone: "110",
-          student_teacher: "吴迪",
-        },
-      ],
+      options: [],
+      studentData: [],
+      path: {
+        path: "/studentInfo",
+        name: "学生管理",
+      }, //面包屑路径
       selectedStudents: [], //存放选择的学生
       deleteFailedStudents: [],
       isShowdeleteFailed: false,
@@ -215,35 +149,56 @@ export default {
   watch: {},
   created() {},
   mounted() {
-    // this.getData();
+    this.getData();
+    this.initOptions();
   },
   methods: {
+    //分页改变页数
+    curPageChange(page) {
+      this.paging.pageNo = page;
+      this.getData();
+    },
+    //分页改变每页条数
+    curPageSizeChange(size) {
+      this.paging.pageSize = size;
+      this.getData();
+    },
+    // 搜索的级联班级数据
+    initOptions() {
+      schoolAll()
+        .then((res) => {
+          this.options = res.data.data.options;
+          console.log("搜索的级联班级数据res", res);
+        })
+        .catch((err) => {
+          console.log("搜索的级联班级数据err", err);
+        });
+    },
     // 选择班级
     handleChange(value) {
       console.log(value);
     },
-    // 搜索表单
-    search() {
-      this.paging.current = 1;
-      // this.getData();
-    },
     // 获取数据
     getData() {
-      const form = { ...this.searchForm };
-      form.page = this.paging.current;
-      request.post("/api/student/search", form).then((res) => {
-        this.studentData = res.data.data.list;
-        this.paging = Object.assign(this.paging, res.data.data.paging);
-        if (this.paging.current > this.paging.pageCount) {
-          this.paging.current = this.paging.pageCount;
-          this.getData();
-        }
-      });
-    },
-    // 当前页码
-    curPageChange(page) {
-      this.paging.current = page;
-      // this.getData();
+      let classId =
+        this.searchForm.class.length == 0 ? "" : this.searchForm.class[2];
+      let data = {
+        classId: classId,
+        pageNo: this.paging.pageNo,
+        pageSize: this.paging.pageSize,
+        studentNo: this.searchForm.studentNoKeyword,
+        username: this.searchForm.studentNameKeyword,
+      };
+      getStudents(data)
+        .then((res) => {
+          this.studentData = res.data.data.students;
+          this.paging.total = res.data.data.pageInfo.totalCount;
+          console.log("获取学生数据res", res);
+        })
+        .catch((err) => {
+          this.$message.error("获取学生失败");
+          console.log("获取学生数据err", err);
+        });
     },
     // 选择学生
     onSelectStudents(students) {

@@ -53,7 +53,7 @@ export default {
           title: "学生管理",
           index: "/studentInfo",
           icon: "el-icon-user",
-          show: identity === 1,
+          show: true,
         },
         {
           title: "辅导员管理",
@@ -84,7 +84,7 @@ export default {
           title: "学生管理",
           index: "/student",
           icon: "el-icon-circle-check",
-          show: identity === 2,
+          show: false,
         },
         {
           title: "打卡记录",

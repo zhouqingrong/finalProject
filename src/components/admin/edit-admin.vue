@@ -103,7 +103,7 @@ export default {
           class_name: info.class_name,
           class_num: info.class_num,
           class_department: info.class_department,
-          class_marjor: info.class_marjor,
+          class_major: info.class_major,
         };
         // 掉修改学生信息接口
         // this.request.post("/api/student/updateOneById", form).then((res) => {

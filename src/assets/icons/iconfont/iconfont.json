@@ -1,0 +1,30 @@
+{
+  "id": "2522994",
+  "name": "clockin",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "3161597",
+      "name": "管理员_角色管理",
+      "font_class": "guanliyuan_jiaoseguanli",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "11690693",
+      "name": "楼房-大厦",
+      "font_class": "ziyuan",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "21370240",
+      "name": "人物-团队",
+      "font_class": "tuandui-copy",
+      "unicode": "e68d",
+      "unicode_decimal": 59021
+    }
+  ]
+}

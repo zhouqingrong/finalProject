@@ -48,6 +48,16 @@ request.interceptors.request.use(
     return Promise.reject(error);
   });
 //响应拦截器
+request.interceptors.response.use(res => {
+  if (res.data.status == "SUCCESS") {
+    return Promise.resolve(res)
+  } else {
+    return Promise.reject(res)
+  }
+}, err => {
+  return Promise.reject(err)
+})
+
 
 //导出请求方法
 export default request

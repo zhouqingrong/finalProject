@@ -119,8 +119,8 @@ export default {
     return {
       opt: 0,
       loginForm: {
-        userName: "13911111111", //手机号
-        pass: "111111", //验证码
+        userName: "sadmin", //手机号
+        pass: "sadmin", //验证码
         agree: false,
       },
       // registerForm: {
@@ -150,14 +150,14 @@ export default {
         //要校验的数据名称：规则列表[]
         userName: [
           { required: true, message: "请输入账号", trigger: "change" },
-          {
-            pattern: /[0|1|2|3|4|5|6|7|8|9]\d{10}$/,
-            message: "请输入正确账号格式",
-          },
+          // {
+          //   pattern: /[0|1|2|3|4|5|6|7|8|9]\d{10}$/,
+          //   message: "请输入正确账号格式",
+          // },
         ],
         pass: [
           { required: true, message: "请输入密码", trigger: "change" },
-          { pattern: /^\d{6}$/, message: "密码不少于六位" },
+          // { pattern: /^\d{6}$/, message: "密码不少于六位" },
         ],
         agree: [
           {
@@ -224,34 +224,7 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    // register() {
-    //   this.registering = true;
-    //   let data = {};
-    //   let user_auth = {};
-    //   user_auth["password"] = this.registerForm.pass;
-    //   user_auth["user_id"] = this.registerForm.userName;
-    //   data["user_auth"] = user_auth;
-    //   register(data)
-    //     .then((res) => {
-    //       //处理后端响应结果
-    //       //注册成功
-    //       console.log("注册成功res", res);
-    //       this.registering = false;
-    //       this.$message({
-    //         message: "注册成功",
-    //         type: "success",
-    //       });
-    //       //跳转到登录
-    //       this.opt = 0;
-    //       this.loginForm.userName = user_auth.user_id;
-    //       this.loginForm.pass = user_auth.password;
-    //     })
-    //     .catch((err) => {
-    //       this.registering = false;
-    //       this.$message.error("注册失败或账户已存在");
-    //       console.log("注册失败", err);
-    //     });
-    // },
+
     login() {
       //开启登录中。。。
       this.loginLoading = true;

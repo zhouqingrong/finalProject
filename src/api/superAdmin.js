@@ -158,3 +158,18 @@ export const deleteDormitory = data => {
     data
   })
 }
+
+//添加宿舍学生
+export const addDormStu = data => {
+  return request({
+    method: 'PUT',
+    url: '/web/dormitory/student?dormitoryId=' + data.dormitoryId + "&studentId=" + data.studentId
+  })
+}
+//删除宿舍学生
+export const delDormStu = data => {
+  return request({
+    method: 'DELETE',
+    url: '/web/dormitory/student?dormitoryId=' + data.dormitoryId + "&studentId=" + data.studentId
+  })
+}

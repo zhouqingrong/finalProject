@@ -9,7 +9,37 @@
       stripe
       v-loading="loading"
     >
-      <el-table-column align="center" type="selection" width="55" />
+      <!-- <el-table-column align="center" type="selection" width="55" /> -->
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <!-- <el-form label-position="left" inline class="demo-table-expand" >
+            <el-form-item label="商品名称">
+              <span>{{ props.row.id }}</span>
+            </el-form-item>
+            <el-form-item label="所属店铺">
+              <span>{{ props.row.id }}</span>
+            </el-form-item>
+          </el-form>-->
+          <el-table :data="props.row.students">
+            <el-table-column align="center" label="学号" prop="stuNo"></el-table-column>
+            <el-table-column align="center" label="姓名" prop="username"></el-table-column>
+            <el-table-column align="center" label="操作">
+              <template #default="scope">
+                <el-tooltip content="删除" v-if="del">
+                  <el-button
+                    @click="deleteDormStu(props.row,scope.row)"
+                    circle
+                    icon="el-icon-delete font-size-16"
+                    plain
+                    size="mini"
+                    type="danger"
+                  />
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="序号" prop="id" sortable />
       <el-table-column align="center" label="社区" prop="community" sortable />
       <el-table-column align="center" label="楼栋" prop="building" sortable />
@@ -42,6 +72,17 @@
               type="danger"
             />
           </el-tooltip>
+          <el-tooltip content="添加学生" v-if="edit">
+            <el-button
+              @click="showAddDormStu(scope.row)"
+              circle
+              :disabled="scope.row.students.length>=scope.row.capacity"
+              icon="el-icon-user font-size-16"
+              primary
+              size="mini"
+              type="success"
+            />
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -62,14 +103,16 @@
       :visible.sync="isShowModify"
       @update="$emit('update')"
     />
+    <edit-dormitory-student :info="curDetail" :visible.sync="isShowStudentDetail" @update="$emit('update')"/>
   </div>
 </template>
 <script>
 import EditDormitory from "@/components/dormitory/edit-dormitory"; //编辑
-import { deleteDormitory } from "@/api/superAdmin";
+import EditDormitoryStudent from "@/components/dormitory/edit-dormitory-student";
+import { deleteDormitory, delDormStu } from "@/api/superAdmin";
 export default {
   name: "dormitory-table",
-  components: { EditDormitory },
+  components: { EditDormitory, EditDormitoryStudent },
   props: {
     list: {
       type: Array,
@@ -85,6 +128,7 @@ export default {
   data() {
     return {
       isShowModify: false,
+      isShowStudentDetail: false,
       curDetail: {},
     };
   },
@@ -93,6 +137,31 @@ export default {
   created() {},
   mounted() {},
   methods: {
+    //添加宿舍学生
+    showAddDormStu(dormitory) {
+      this.curDetail = dormitory;
+      this.isShowStudentDetail = true;
+    },
+    //删除宿舍学生
+    deleteDormStu(dormitory, student) {
+      this.$confirm("此操作将学生移除该宿舍，是否继续？", "提示", {
+        type: "warning",
+      }).then(() => {
+        let data = {
+          dormitoryId: dormitory.id,
+          studentId: student.id,
+        };
+        delDormStu(data)
+          .then((res) => {
+            this.$message.success("移除学生成功");
+            this.$emit("update");
+          })
+          .catch((err) => {
+            this.$message.error("移除学生失败");
+            console.log("移除宿舍学生err", err);
+          });
+      });
+    },
     //宿舍容量转换
     capacityConvert(row, column, v) {
       if (!row.students) {

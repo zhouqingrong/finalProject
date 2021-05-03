@@ -12,14 +12,6 @@
       <!-- <el-table-column align="center" type="selection" width="55" /> -->
       <el-table-column type="expand">
         <template slot-scope="props">
-          <!-- <el-form label-position="left" inline class="demo-table-expand" >
-            <el-form-item label="商品名称">
-              <span>{{ props.row.id }}</span>
-            </el-form-item>
-            <el-form-item label="所属店铺">
-              <span>{{ props.row.id }}</span>
-            </el-form-item>
-          </el-form>-->
           <el-table :data="props.row.students">
             <el-table-column align="center" label="学号" prop="stuNo"></el-table-column>
             <el-table-column align="center" label="姓名" prop="username"></el-table-column>

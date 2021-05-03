@@ -5,50 +5,41 @@
       append-to-body
       :before-close="beforeClose"
       :close-on-click-modal="false"
-      :title="'修改' + curDetail.admin_name + '的信息'"
+      :title="'修改' + curDetail.adminName + '的信息'"
       :visible="visible"
       @update:visible="$emit('update:visible', $event)"
       width="500px"
     >
       <el-form :model="info" label-width="100px" ref="form">
         <el-form-item label="序号" prop="admin_num">
-          <el-input :value="info.class_num" disabled style="width: 200px" />
+          <el-input :value="info.id" disabled style="width: 200px" />
         </el-form-item>
-        <el-form-item
-          label="学院"
-          prop="admin_department"
-          :rules="[{ required: true, message: '学院不能为空' }]"
-        >
+        <el-form-item label="学院" prop="department" :rules="[{ required: true, message: '学院不能为空' }]">
           <el-select
             placeholder="选择学院"
             size="medium"
             style="width: 200px"
-            v-model="info.class_department"
+            v-model="info.department"
           >
-            <el-option :value="1" label="信电学院"></el-option>
-            <el-option :value="2" label="文法学院"></el-option>
+            <el-option
+              :key="item.label"
+              :label="item.label"
+              :value="item.value"
+              v-for="item in department"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item
-          :rules="[{ required: true, message: '账号不能为空' }]"
-          label="账号"
-          prop="admin_account"
-        >
-          <el-input style="width: 200px" v-model="info.admin_account" />
+        <el-form-item :rules="[{ required: true, message: '账号不能为空' }]" label="账号" prop="account">
+          <el-input style="width: 200px" v-model="info.account" />
         </el-form-item>
-        <el-form-item
-          :rules="[{ required: true, message: '姓名不能为空' }]"
-          label="姓名"
-          prop="admin_name"
-        >
-          <el-input style="width: 200px" v-model="info.admin_name" />
+        <el-form-item :rules="[{ required: true, message: '姓名不能为空' }]" label="姓名" prop="adminName">
+          <el-input style="width: 200px" v-model="info.adminName" />
         </el-form-item>
-        <el-form-item
-          :rules="[{ required: true, message: '联系方式不能为空' }]"
-          label="电话"
-          prop="admin_phone"
-        >
-          <el-input style="width: 200px" v-model="info.admin_phone" />
+        <el-form-item :rules="[{ required: true, message: '联系方式不能为空' }]" label="电话" prop="phone">
+          <el-input style="width: 200px" v-model="info.phone" />
+        </el-form-item>
+        <el-form-item label="管理的班级" prop="admin_classes">
+          <el-cascader v-model="info.admin_classes" :options="options" :props="props" clearable></el-cascader>
         </el-form-item>
         <section class="flex-center">
           <el-button @click="save" type="primary">保存</el-button>
@@ -59,6 +50,8 @@
   </div>
 </template>
 <script>
+import { departmentMajors } from "@/utils/staticData";
+import { schoolAll, updateAdmin } from "@/api/superAdmin";
 export default {
   name: "edit-admin",
   components: {},
@@ -71,6 +64,8 @@ export default {
   },
   data() {
     return {
+      department: departmentMajors,
+      props: { multiple: true },
       info: {},
     };
   },
@@ -85,8 +80,20 @@ export default {
     },
   },
   created() {},
-  mounted() {},
+  mounted() {
+    this.initOptions();
+  },
   methods: {
+    initOptions() {
+      schoolAll()
+        .then((res) => {
+          this.options = res.data.data.options;
+          console.log("搜索的级联班级数据res", res);
+        })
+        .catch((err) => {
+          console.log("搜索的级联班级数据err", err);
+        });
+    },
     beforeClose(done) {
       done && done();
     },
@@ -94,30 +101,46 @@ export default {
       this.$emit("update:visible", false);
       this.beforeClose();
     },
-    async save() {
-      try {
-        await this.$refs.form.validate();
-        const info = this.info;
-        const form = {
-          _id: info._id,
-          class_name: info.class_name,
-          class_num: info.class_num,
-          class_department: info.class_department,
-          class_major: info.class_major,
-        };
-        // 掉修改学生信息接口
-        // this.request.post("/api/student/updateOneById", form).then((res) => {
-        //   if (!res.data.errcode) {
-        //     this.$alert("修改成功！", "提示", { type: "success" });
-        //     this.closeDialog();
-        //     this.$emit("update");
-        //   } else {
-        //     this.$alert(res.data.msg, "错误", { type: "error" });
-        //   }
-        // });
-      } catch (e) {
-        return false;
-      }
+    save() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const info = this.info;
+          let classIds = [];
+          for (let i = 0; i < info.admin_classes.length; i++) {
+            classIds.push(info.admin_classes[i][2]);
+          }
+          const data = {
+            account: info.account,
+            adminName: info.adminName,
+            classIds: classIds,
+            department: info.department,
+            id: info.id,
+            //password: info,
+            phone: info.phone,
+          };
+          updateAdmin(data)
+            .then((res) => {
+              this.$message.success("修改成功");
+              this.$emit("update");
+              this.closeDialog();
+            })
+            .catch((err) => {
+              this.$message.error("修改失败");
+              console.log("管理员修改失败err", err);
+            });
+        }
+      });
+
+      // 掉修改学生信息接口
+      // this.request.post("/api/student/updateOneById", form).then((res) => {
+      //   if (!res.data.errcode) {
+      //     this.$alert("修改成功！", "提示", { type: "success" });
+      //     this.closeDialog();
+      //     this.$emit("update");
+      //   } else {
+      //     this.$alert(res.data.msg, "错误", { type: "error" });
+      //   }
+      // });
     },
   },
 };

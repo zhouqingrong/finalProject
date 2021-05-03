@@ -1,6 +1,6 @@
 <template>
   <el-menu
-    default-active="/"
+    :default-active="route"
     background-color="#354358"
     text-color="#fff"
     active-text-color="#ffd04b"
@@ -28,6 +28,7 @@
   </el-menu>
 </template>
 <script>
+import EventBus from "@/EventBus.js";
 export default {
   name: "AppAside",
   components: {},
@@ -35,6 +36,7 @@ export default {
   data() {
     return {
       // isCollapse: true,
+      route: "/home",
       identity: 1,
     };
   },
@@ -108,7 +110,11 @@ export default {
     },
   },
   watch: {},
-  created() {},
+  created() {
+    EventBus.$on("change-route", (route) => {
+      this.route = route;
+    });
+  },
   mounted() {},
   methods: {},
 };

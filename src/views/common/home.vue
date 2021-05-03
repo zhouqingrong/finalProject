@@ -20,25 +20,23 @@
             class="card-panel-num"
           />
         </div>
-      </div> -->
+      </div>-->
       <el-card>
         <div class="box-card">
           <svg class="svgbg" aria-hidden="true">
-            <use xlink:href="#icon-tuandui-copy" class="icon-student"></use>
+            <use xlink:href="#icon-tuandui-copy" class="icon-student" />
           </svg>
           <div class="text">1111</div>
         </div>
       </el-card>
       <el-card class="box-card">
-        <div v-for="o in 2" :key="o" class="text item">
-          {{ "列表内容 " + o }}
-        </div>
+        <div v-for="o in 2" :key="o" class="text item">{{ "列表内容 " + o }}</div>
       </el-card>
       <!-- <el-card class="box-card">
         <div v-for="o in 2" :key="o" class="text item">
           {{ "列表内容 " + o }}
         </div>
-      </el-card> -->
+      </el-card>-->
     </div>
     <!-- 图表 -->
     <div id="chart"></div>
@@ -47,6 +45,7 @@
 <script>
 import * as echarts from "echarts";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
+import EventBus from "@/EventBus";
 export default {
   name: "home",
   components: { Breadcrumb },
@@ -68,6 +67,7 @@ export default {
   created() {},
   mounted() {
     this.initEchart();
+    EventBus.$emit("change-route", "/home");
   },
   methods: {
     initEchart() {

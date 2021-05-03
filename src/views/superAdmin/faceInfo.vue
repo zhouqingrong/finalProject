@@ -14,7 +14,7 @@
               size="medium"
               v-model="searchForm.classKeyword"
             />
-          </el-form-item> -->
+          </el-form-item>-->
           <el-form-item label="搜索">
             <!-- <el-select
               v-model="searchForm.classKeyword"
@@ -24,7 +24,7 @@
             >
               <el-option label="信电学院" value="信电学院"></el-option>
               <el-option label="机械学院" value="机械学院"></el-option>
-            </el-select> -->
+            </el-select>-->
             <el-cascader
               placeholder="按学院、专业、班级搜索"
               prefix-icon="el-icon-search"
@@ -34,7 +34,7 @@
               @change="handleChange"
             ></el-cascader>
           </el-form-item>
-          <el-form-item label="">
+          <el-form-item label>
             <el-input
               clearable
               placeholder="按状态搜索"
@@ -45,9 +45,7 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button native-type="submit" size="medium" type="primary"
-              >搜索</el-button
-            >
+            <el-button native-type="submit" size="medium" type="primary">搜索</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -56,7 +54,7 @@
         <el-button size="medium" type="info" @click="isShowAddDialog = true"
           >新增</el-button
         >
-      </div> -->
+      </div>-->
     </section>
     <!-- 表格 -->
     <face-table
@@ -75,7 +73,7 @@
 <script>
 import FaceTable from "@/components/face/face-table.vue";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
-
+import EventBus from "@/EventBus";
 export default {
   name: "classInfo",
   components: { FaceTable, Breadcrumb },
@@ -150,7 +148,7 @@ export default {
         },
       ],
       path: {
-        path: "/classInfo",
+        path: "/faceInfo",
         name: "人脸图库",
       }, //面包屑路径
     };
@@ -158,7 +156,9 @@ export default {
   computed: {},
   watch: {},
   created() {},
-  mounted() {},
+  mounted() {
+    EventBus.$emit("change-route", "/faceInfo");
+  },
   methods: {
     // 选择
     onSelect(selected) {

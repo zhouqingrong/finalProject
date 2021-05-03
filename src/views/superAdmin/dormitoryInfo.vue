@@ -60,6 +60,7 @@ import DormitoryTable from "@/components/dormitory/dormitory-table.vue";
 import AddDormitory from "../../components/dormitory/add-dormitory.vue";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
 import { getDormitories } from "@/api/superAdmin";
+import EventBus from "@/EventBus";
 export default {
   name: "dormitoryInfo",
   components: { DormitoryTable, AddDormitory, Breadcrumb },
@@ -101,6 +102,7 @@ export default {
   created() {},
   mounted() {
     this.getData();
+    EventBus.$emit("change-route", "/dormitoryInfo");
   },
   methods: {
     //分页改变页数

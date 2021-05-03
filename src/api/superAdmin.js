@@ -173,3 +173,39 @@ export const delDormStu = data => {
     url: '/web/dormitory/student?dormitoryId=' + data.dormitoryId + "&studentId=" + data.studentId
   })
 }
+
+//获取管理员
+export const getAdmins = data => {
+  return request({
+    method: 'POST',
+    url: '/web/admins/list',
+    data
+  })
+}
+
+//修改管理员
+export const updateAdmin = data => {
+  return request({
+    method: 'PUT',
+    url: "/web/admin/" + data.id,
+    data
+  })
+}
+
+//删除管理员
+export const deleteAdmin = data => {
+  return request({
+    method: 'DELETE',
+    url: "/web/admin/" + data.id,
+    data
+  })
+}
+
+//新增管理员
+export const addAdmin = data => {
+  return request({
+    method: 'POST',
+    url: '/web/admin',
+    data
+  })
+}

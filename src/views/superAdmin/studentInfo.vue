@@ -108,6 +108,7 @@ import StudentTable from "@/components/student/student-table.vue";
 import AddStudent from "@/components/student/add-student.vue";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
 import { schoolAll, getStudents } from "@/api/superAdmin.js";
+import EventBus from "@/EventBus";
 // import BulkImportStudents from "@/components/student/bulk-import-students";
 export default {
   name: "studentInfo",
@@ -145,6 +146,7 @@ export default {
   mounted() {
     this.getData();
     this.initOptions();
+    EventBus.$emit("change-route", "/studentInfo");
   },
   methods: {
     //分页改变页数

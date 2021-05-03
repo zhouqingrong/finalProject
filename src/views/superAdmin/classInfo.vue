@@ -61,6 +61,7 @@ import AddClass from "../../components/class/add-class.vue";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
 import { getClasses } from "@/api/superAdmin.js";
 import { departmentMajorsMap } from "@/utils/staticData.js";
+import EventBus from "@/EventBus";
 export default {
   name: "classInfo",
   components: { ClassTable, AddClass, Breadcrumb },
@@ -91,6 +92,7 @@ export default {
   created() {},
   mounted() {
     this.getData();
+    EventBus.$emit("change-route", "/classInfo");
   },
   methods: {
     // 获取数据

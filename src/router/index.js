@@ -11,10 +11,8 @@ import StudentInfo from '@/views/superAdmin/studentInfo.vue'
 import ClassInfo from '@/views/superAdmin/classInfo.vue'
 import FaceInfo from '@/views/superAdmin/faceInfo.vue'
 import DormitoryInfo from '@/views/superAdmin/dormitoryInfo.vue'
-import Record from '@/views/admin/record.vue'
-import Role from '@/views/admin/role.vue'
+import Record from '@/views/admin/recordInfo.vue'
 import Setting from '@/views/admin/setting.vue'
-import Student from '@/views/admin/student.vue'
 
 
 Vue.use(Router)
@@ -65,18 +63,10 @@ const routes = [
         name: 'record',
         component: Record
       }, {
-        path: '/role',
-        name: 'role',
-        component: Role
-      }, {
         path: '/setting',
         name: 'setting',
         component: Setting
-      }, {
-        path: '/student',
-        name: 'student',
-        component: Student
-      }
+      },
     ]
   },
   {

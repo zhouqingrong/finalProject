@@ -7,6 +7,16 @@
 <script>
 export default {
   name: "App",
+  created() {
+    Date.prototype.toLocaleString = function () {
+      // 重写日期函数格式化日期
+      return `${this.getFullYear()}-${
+        this.getMonth() + 1 >= 10
+          ? this.getMonth() + 1
+          : "0" + (this.getMonth() + 1)
+      }-${this.getDate() >= 10 ? this.getDate() : "0" + this.getDate()}`;
+    };
+  },
 };
 </script>
 

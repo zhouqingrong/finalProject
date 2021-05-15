@@ -1,95 +1,101 @@
 <template>
-  <div class="AdminContainer">
+  <div class="RecordInfoContainer">
     <!-- 面包屑 -->
     <Breadcrumb :path="path" />
+    <!-- 搜索模块 -->
     <section class="offset-fotm-item search">
       <div>
-        <!-- 搜索栏 -->
         <el-form inline>
           <el-form-item label="搜索">
             <el-input
               clearable
-              placeholder="按学院搜索"
+              placeholder="按学号搜索"
               prefix-icon="el-icon-search"
               size="medium"
-              v-model="searchForm.departmentKeyword"
+              v-model="searchForm.studentNoKeyword"
             />
           </el-form-item>
-          <el-form-item label>
+          <el-form-item label="">
             <el-input
               clearable
               placeholder="按姓名搜索"
               prefix-icon="el-icon-search"
               size="medium"
-              style="width: 180px"
-              v-model="searchForm.nameKeyword"
+              v-model="searchForm.studentNameKeyword"
             />
           </el-form-item>
+          <!-- <el-form-item label="班级">
+            <el-cascader
+              clearable
+              v-model="searchForm.class"
+              :options="options"
+              @change="handleChange"
+            ></el-cascader>
+          </el-form-item> -->
           <el-form-item>
             <el-button
               native-type="submit"
               size="medium"
-              @click="getData"
               type="primary"
+              @click="getData()"
               >搜索</el-button
             >
           </el-form-item>
         </el-form>
       </div>
-      <!-- 新增按钮 -->
-      <div style="margin-left: auto !important">
-        <!--  -->
+      <!-- 新增学生按钮 -->
+      <!-- <div style="margin-left: auto !important">
         <el-button size="medium" type="info" @click="isShowAddDialog = true"
-          >新增管理员</el-button
+          >新增学生</el-button
         >
-      </div>
+      </div> -->
     </section>
-    <!-- admin表格 -->
-    <admin-table
+    <!-- 记录的表格 -->
+    <record-table
       :cur-page="paging.pageNo"
-      :cur-pageSize="paging.pageSize"
-      :list="adminData"
+      :list="recordData"
       :total="paging.total"
+      :cur-pageSize="paging.pageSize"
       :loading="loading"
-      @select:selected="onSelect"
       @current-change="curPageChange"
       @size-change="curPageSizeChange"
       @update="getData"
       edit
       del
+      class="margin-top-20 width-full"
     />
-    <!-- 新增 -->
-    <add-admin :visible.sync="isShowAddDialog" @update="getData" />
   </div>
 </template>
 <script>
-import AdminTable from "@/components/admin/admin-table.vue";
-import AddAdmin from "../../components/admin/add-admin.vue";
+import RecordTable from "@/components/record/record-table.vue";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
 import EventBus from "@/EventBus";
-import { getAdmins } from "@/api/superAdmin";
+import { schoolAll } from "@/api/superAdmin.js";
+import { getRecords } from "@/api/admin.js";
+
 export default {
-  name: "adminInfo",
-  components: { AdminTable, AddAdmin, Breadcrumb },
+  name: "record",
+  components: { Breadcrumb, RecordTable },
   props: {},
   data() {
     return {
       loading: false,
-      searchForm: {
-        departmentKeyword: "",
-        nameKeyword: "",
-      },
       paging: {
         pageNo: 1,
         total: 1,
         pageSize: 10,
       },
-      isShowAddDialog: false,
-      adminData: [],
+      searchForm: {
+        studentNameKeyword: "",
+        studentNoKeyword: "",
+        class: [],
+      },
+      options: [],
+      recordData: [],
       path: {
         //面包屑路径
-        path: "/adminInfo",
-        name: "管理员管理",
+        path: "/record",
+        name: "打卡记录",
       },
     };
   },
@@ -97,15 +103,11 @@ export default {
   watch: {},
   created() {},
   mounted() {
+    EventBus.$emit("change-route", "/record");
     this.getData();
-    EventBus.$emit("change-route", "/adminInfo");
+    this.initOptions();
   },
   methods: {
-    // 选择
-    onSelect(selected) {
-      console.log("选中的管理员：", selected);
-      this.selected = selected;
-    },
     //分页改变页数
     curPageChange(page) {
       this.paging.pageNo = page;
@@ -116,24 +118,42 @@ export default {
       this.paging.pageSize = size;
       this.getData();
     },
+    // 搜索的级联班级数据
+    initOptions() {
+      schoolAll()
+        .then((res) => {
+          this.options = res.data.data.options;
+          console.log("搜索的级联班级数据res", res);
+        })
+        .catch((err) => {
+          console.log("搜索的级联班级数据err", err);
+        });
+    },
+    // 选择班级
+    handleChange(value) {
+      console.log(value);
+    },
+    // 获取数据
     getData() {
+      let classIds = JSON.parse(window.localStorage.getItem("user")).classIds;
       let data = {
+        classIds: classIds,
         pageNo: this.paging.pageNo,
         pageSize: this.paging.pageSize,
-        adminName: this.searchForm.nameKeyword,
-        department: this.searchForm.departmentKeyword,
+        studentNo: this.searchForm.studentNoKeyword,
+        username: this.searchForm.studentNameKeyword,
       };
       this.loading = true;
-      getAdmins(data)
+      getRecords(data)
         .then((res) => {
-          this.adminData = res.data.data.users;
+          this.recordData = res.data.data.students;
           this.paging.total = res.data.data.pageInfo.totalCount;
-          console.log("获取管理员res", res);
+          console.log("获取学生记录数据res", res);
           this.loading = false;
         })
         .catch((err) => {
-          console.log("获取管理员err", err);
-          this.$message.error("获取管理员列表失败");
+          this.$message.error("获取打卡记录失败");
+          console.log("获取打卡记录数据err", err);
           this.loading = false;
         });
     },

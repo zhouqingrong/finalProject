@@ -2,7 +2,7 @@
  * 登录注册相关请求模块
  */
 import request from '@/utils/request'
-import url from 'postcss-url'
+
 //用户登录
 export const login = data => {
   return request({
@@ -41,6 +41,20 @@ export const login = data => {
 // }
 
 //学校信息处理
+//获取首页固定数据
+export const getCounts = () => {
+  return request({
+    method: 'GET',
+    url: '/web/school/count'
+  })
+}
+//获取首页打卡数据
+export const getRecordStatus = () => {
+  return request({
+    method: 'GET',
+    url: '/web/record/department',
+  })
+}
 //获取学院
 export const getDepartments = data => {
   return request({
@@ -209,3 +223,4 @@ export const addAdmin = data => {
     data
   })
 }
+

@@ -1,41 +1,36 @@
 <template>
   <div class="FaceContainer">
     <!-- 人脸表格 -->
-    <div class="faceCardContainer">
-      <el-card
-        class="box-card"
-        :body-style="{ padding: '5px' }"
-        v-for="(item, index) in list"
-        :key="index"
-        v-loading="loading"
-      >
-        <div class="image">
-          <!-- 'https://www.hualigs.cn/image/5ffafc911e172.jpg' -->
-          <el-image
-            :src="
-              item.faceUrl == null || item.faceUrl == ''
-                ? require('../../assets/img/nopic.png')
-                : item.faceUrl
-            "
-            alt="人脸图片"
-            fit="contain"
-          />
-        </div>
-        <!-- <div class="itemTitle">{{ item.stuNo }}</div> -->
-        <div class="itemTitle">{{ item.username }}</div>
-        <div class="bottom">
+    <el-table
+      :data="list"
+      :default-sort="{ prop: 'student_num', order: 'ascending' }"
+      @selection-change="selected"
+      border
+      stripe
+    >
+      <el-table-column align="center" type="selection" width="55" />
+      <el-table-column
+        align="center"
+        label="学号"
+        prop="student_num"
+        sortable
+      />
+      <el-table-column align="center" label="姓名" prop="student_name" />
+      <el-table-column align="center" label="人脸" prop="student_face" />
+      <el-table-column align="center" label="操作">
+        <template #default="scope">
           <el-tooltip content="查看/编辑信息" v-if="edit">
             <el-button
-              @click="showModifyFace(item)"
+              @click="showModifyFace(scope.row)"
               circle
               icon="el-icon-edit font-size-16"
               plain
               size="mini"
             />
           </el-tooltip>
-          <el-tooltip content="删除人脸图片" v-if="del">
+          <el-tooltip content="删除" v-if="del">
             <el-button
-              @click="deleteFace(item)"
+              @click="deleteFace(scope.row)"
               circle
               icon="el-icon-delete font-size-16"
               plain
@@ -43,20 +38,20 @@
               type="danger"
             />
           </el-tooltip>
-        </div>
-      </el-card>
-    </div>
+        </template>
+      </el-table-column>
+    </el-table>
     <!-- 分页信息 -->
-    <el-pagination
-      class="pagination"
-      @size-change="$emit('size-change', $event)"
-      @current-change="$emit('current-change', $event)"
+    <!-- <el-pagination
       :current-page="curPage"
-      :page-sizes="[5, 10, 20, 50]"
-      :page-size="curPageSize"
-      layout="total, sizes, prev, pager, next, jumper"
       :total="total"
-    ></el-pagination>
+      @current-change="$emit('current-change', $event)"
+      background
+      class="margin-top-20"
+      layout="total, prev, pager, next"
+      style="text-align: right"
+    >
+    </el-pagination> -->
     <!--  编辑/查看-->
     <edit-face
       :curDetail.sync="curDetail"
@@ -77,10 +72,8 @@ export default {
     },
     total: Number,
     curPage: Number,
-    curPageSize: Number,
     edit: Boolean,
     del: Boolean,
-    loading: Boolean,
   },
   data() {
     return {
@@ -91,23 +84,21 @@ export default {
   computed: {},
   watch: {},
   created() {},
-  mounted() {
-    console.log("look here：", this.list);
-  },
+  mounted() {},
   methods: {
     // 选中班级
     selected(selected) {
       this.$emit("select:selected", selected);
     },
     // 修改信息
-    showModifyFace(item) {
-      console.log("修改人脸信息row：", item);
-      this.curDetail = item;
+    showModifyFace(row) {
+      console.log("修改人脸信息row：", row);
+      this.curDetail = row;
       this.isShowModify = true;
     },
     // 删除
-    deleteFace(item) {
-      console.log("删除改行信息row", item);
+    deleteFace(row) {
+      console.log("删除改行信息row", row);
       this.$confirm("此操作将永久删除该学生且无法恢复，是否继续？", "提示", {
         type: "warning",
       }).then(() => {
@@ -127,34 +118,4 @@ export default {
 };
 </script>
 <style scoped>
-.box-card {
-  width: 120px;
-  height: 220px;
-  margin: 20px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.image {
-  margin-top: 5px;
-  height: 140px;
-  width: 142px;
-}
-.itemTitle {
-  margin-top: 5px;
-  font-size: 12px;
-}
-.bottom {
-  margin-top: 12px;
-}
-.faceCardContainer {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: start;
-}
-.pagination {
-  margin: 30px auto;
-}
 </style>

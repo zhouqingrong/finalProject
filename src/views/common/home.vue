@@ -4,39 +4,39 @@
     <Breadcrumb :path="path" />
     <!-- 首页内容 -->
     <div class="cardContainer">
-      <!-- <div class="card-panel">
-        <div class="card-panel-icon-wrapper">
-          <svg class="icon-people" aria-hidden="true">
-            <use xlink:href="#icon-tuandui" class=""></use>
-          </svg>
-         // <svg-icon icon-class="peoples" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">New Visits</div>
-          <count-to
-            :start-val="0"
-            :end-val="102400"
-            :duration="2600"
-            class="card-panel-num"
-          />
-        </div>
-      </div>-->
       <el-card>
         <div class="box-card">
           <svg class="svgbg" aria-hidden="true">
             <use xlink:href="#icon-tuandui-copy" class="icon-student" />
           </svg>
-          <div class="text">1111</div>
+          <div class="text">
+            学生人数：<span class="num">{{ stuCount }}</span>
+          </div>
         </div>
       </el-card>
-      <el-card class="box-card">
-        <div v-for="o in 2" :key="o" class="text item">{{ "列表内容 " + o }}</div>
-      </el-card>
-      <!-- <el-card class="box-card">
-        <div v-for="o in 2" :key="o" class="text item">
-          {{ "列表内容 " + o }}
+      <el-card>
+        <div class="box-card">
+          <svg class="svgbg" aria-hidden="true">
+            <use
+              xlink:href="#icon-guanliyuan_jiaoseguanli"
+              class="icon-student"
+            />
+          </svg>
+          <div class="text">
+            辅导员人数：<span class="num">{{ adminCount }}</span>
+          </div>
         </div>
-      </el-card>-->
+      </el-card>
+      <el-card>
+        <div class="box-card">
+          <svg class="svgbg" aria-hidden="true">
+            <use xlink:href="#icon-ziyuan" class="icon-student" />
+          </svg>
+          <div class="text">
+            宿舍间数：<span class="num">{{ dormitoryCount }}</span>
+          </div>
+        </div>
+      </el-card>
     </div>
     <!-- 图表 -->
     <div id="chart"></div>
@@ -46,19 +46,65 @@
 import * as echarts from "echarts";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
 import EventBus from "@/EventBus";
+import { getCounts, getRecordStatus } from "@/api/superAdmin.js";
 export default {
   name: "home",
   components: { Breadcrumb },
   props: {},
   data() {
     return {
+      stuCount: 0,
+      adminCount: 0,
+      dormitoryCount: 0,
       path: {
         path: "",
         name: "",
       },
       chartData: {
-        actualData: [120, 82, 91, 154, 162, 140, 145],
-        expectedData: [100, 120, 161, 134, 105, 160, 165],
+        actualData: [
+          100,
+          82,
+          161,
+          134,
+          105,
+          160,
+          165,
+          100,
+          82,
+          161,
+          134,
+          105,
+          160,
+          165,
+          160,
+          165,
+          100,
+          82,
+          161,
+        ],
+        expectedData: [
+          100,
+          82,
+          161,
+          134,
+          105,
+          160,
+          165,
+          100,
+          82,
+          161,
+          134,
+          105,
+          160,
+          165,
+          160,
+          165,
+          100,
+          82,
+          161,
+        ],
+        department: [],
+        // expectedData: [120, 120, 191, 154, 162, 240, 185],
       },
     };
   },
@@ -66,16 +112,59 @@ export default {
   watch: {},
   created() {},
   mounted() {
-    this.initEchart();
+    this.initCount();
     EventBus.$emit("change-route", "/home");
   },
   methods: {
+    initCount() {
+      getCounts()
+        .then((res) => {
+          this.stuCount = res.data.data.studentCount;
+          this.adminCount = res.data.data.adminCount;
+          this.dormitoryCount = res.data.data.dormitoryCount;
+        })
+        .catch((err) => {
+          this.$message.error("获取数据失败");
+          console.log("========err", err);
+        });
+      getRecordStatus()
+        .then((res) => {
+          this.chartData.department = res.data.data.departments;
+          this.chartData.expectedData = res.data.data.studentCount;
+          this.chartData.actualData = res.data.data.recordCount;
+          console.log("获取打卡数据res", res);
+          this.initEchart();
+        })
+        .catch((err) => {
+          this.$message.error("获取打卡数据失败");
+          console.log("获取打卡数据失败err", err);
+        });
+    },
     initEchart() {
       var myChart = echarts.init(document.getElementById("chart"));
-      console.log("获取dom元素", myChart);
+      // console.log("获取dom元素", myChart);
       myChart.setOption({
         xAxis: {
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          data: this.chartData.department,
+          // data: [
+          //   "建筑学院",
+          //   "数理学院",
+          //   "土木学院",
+          //   "水电学院",
+          //   "能环学院",
+          //   "医学院",
+          //   "机械学院",
+          //   "信电学院",
+          //   "矿测学院",
+          //   "地球学院",
+          //   "材料学院",
+          //   "管商学院",
+          //   "文法学院",
+          //   "园林学院",
+          //   "生命学院",
+          //   "马克思主义学院",
+          //   "体育学院",
+          // ],
           boundaryGap: false,
           axisTick: {
             show: false,
@@ -83,7 +172,7 @@ export default {
         },
         grid: {
           left: 10,
-          right: 10,
+          right: 25,
           bottom: 20,
           top: 30,
           containLabel: true,
@@ -101,11 +190,11 @@ export default {
           },
         },
         legend: {
-          data: ["expected", "actual"],
+          data: ["学生人数", "今日打卡人数"],
         },
         series: [
           {
-            name: "expected",
+            name: "学生人数",
             itemStyle: {
               normal: {
                 color: "#FF005A",
@@ -122,7 +211,7 @@ export default {
             animationEasing: "cubicInOut",
           },
           {
-            name: "actual",
+            name: "今日打卡人数",
             smooth: true,
             type: "line",
             itemStyle: {
@@ -155,14 +244,14 @@ export default {
   margin-bottom: 50px;
 }
 .text {
-  font-size: 14px;
+  font-size: 20px;
   padding: 18px 0;
-  width: 300px;
+  width: 180px;
 }
 
 .box-card {
-  width: 460px;
-  height: 180px;
+  width: 400px;
+  height: 150px;
   cursor: pointer;
   display: flex;
   flex-direction: row;
@@ -174,6 +263,7 @@ export default {
   height: 400px;
 }
 .svgbg {
+  margin-left: 30px;
   display: block;
   height: 100px;
   width: 80px;
@@ -182,14 +272,4 @@ export default {
 .icon-student {
   color: #40c9c6;
 }
-
-/* .card-panel:hover .card-panel-icon-wrapper {
-  color: #fff;
-}
-.card-panel:hover .icon-people {
-  background: #40c9c6;
-}
-.icon-people {
-  color: #40c9c6;
-} */
 </style>

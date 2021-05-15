@@ -16,19 +16,9 @@
             />
           </el-form-item>-->
           <el-form-item label="搜索">
-            <!-- <el-select
-              v-model="searchForm.classKeyword"
-              placeholder="按学院、专业、班级搜索"
-              prefix-icon="el-icon-search"
-              size="medium"
-            >
-              <el-option label="信电学院" value="信电学院"></el-option>
-              <el-option label="机械学院" value="机械学院"></el-option>
-            </el-select>-->
             <el-cascader
-              placeholder="按学院、专业、班级搜索"
-              prefix-icon="el-icon-search"
-              size="medium"
+              placeholder="请选择学院、专业、班级"
+              clearable
               v-model="searchForm.classKeyword"
               :options="options"
               @change="handleChange"
@@ -37,15 +27,17 @@
           <el-form-item label>
             <el-input
               clearable
-              placeholder="按状态搜索"
+              placeholder="按姓名搜索"
               prefix-icon="el-icon-search"
               size="medium"
               style="width: 180px"
-              v-model="searchForm.statusKeyword"
+              v-model="searchForm.studentNameKeyword"
             />
           </el-form-item>
           <el-form-item>
-            <el-button native-type="submit" size="medium" type="primary">搜索</el-button>
+            <el-button size="medium" type="primary" @click="getData()"
+              >搜索</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -58,10 +50,15 @@
     </section>
     <!-- 表格 -->
     <face-table
-      :cur-page="paging.current"
-      :list="faceData"
+      :cur-page="paging.pageNo"
       :total="paging.total"
+      :cur-pageSize="paging.pageSize"
+      :loading="loading"
+      :list="studentData"
       @select:selected="onSelect"
+      @current-change="curPageChange"
+      @size-change="curPageSizeChange"
+      @update="getData"
       edit
       del
       class="margin-top-20 width-full"
@@ -74,79 +71,27 @@
 import FaceTable from "@/components/face/face-table.vue";
 import Breadcrumb from "@/components/breadcrumb/index.vue";
 import EventBus from "@/EventBus";
+import { getStudents, schoolAll } from "@/api/superAdmin";
 export default {
   name: "classInfo",
   components: { FaceTable, Breadcrumb },
   props: {},
   data() {
     return {
+      loading: false,
       searchForm: {
-        classKeyword: "", //学院班级姓名联查
-        statusKeyword: "", //是否存有照片状态
+        classKeyword: [], //学院班级姓名联查
+        studentNameKeyword: "", //按用户名搜素
       },
       paging: {
-        current: 1,
+        pageNo: 1,
         total: 1,
-        pageCount: 1,
+        pageSize: 10,
       },
       isShowAddDialog: false,
-      faceData: [
-        {
-          student_num: "170950212",
-          student_name: "zz",
-          student_face: "1",
-        },
-        {
-          student_num: "170950213",
-          student_name: "tcg",
-          student_face: "2",
-        },
-      ],
+      studentData: [],
       selected: [],
-      options: [
-        {
-          value: "xindian",
-          label: "信电学院",
-          children: [
-            {
-              value: "rjgc",
-              label: "软件工程",
-              children: [
-                {
-                  value: "1701",
-                  label: "1701",
-                },
-                {
-                  value: "1702",
-                  label: "1702",
-                },
-                {
-                  value: "1703",
-                  label: "1703",
-                },
-                {
-                  value: "1801",
-                  label: "1801",
-                },
-              ],
-            },
-            {
-              value: "zdh",
-              label: "自动化",
-              children: [
-                {
-                  value: "1701",
-                  label: "1701",
-                },
-                {
-                  value: "1702",
-                  label: "1702",
-                },
-              ],
-            },
-          ],
-        },
-      ],
+      options: [],
       path: {
         path: "/faceInfo",
         name: "人脸图库",
@@ -158,16 +103,64 @@ export default {
   created() {},
   mounted() {
     EventBus.$emit("change-route", "/faceInfo");
+    this.initOptions();
+    this.getData();
   },
   methods: {
+    // 搜索的级联班级数据
+    initOptions() {
+      schoolAll()
+        .then((res) => {
+          this.options = res.data.data.options;
+          console.log("搜索的级联班级数据res", res);
+        })
+        .catch((err) => {
+          console.log("搜索的级联班级数据err", err);
+        });
+    },
+    //分页改变页数
+    curPageChange(page) {
+      this.paging.pageNo = page;
+      this.getData();
+    },
+    //分页改变每页条数
+    curPageSizeChange(size) {
+      this.paging.pageSize = size;
+      this.getData();
+    },
     // 选择
     onSelect(selected) {
       console.log("选中的：", selected);
       this.selected = selected;
     },
-    // 选择班级
     handleChange(value) {
       console.log(value);
+    },
+    // 获取数据
+    getData() {
+      let classId =
+        this.searchForm.classKeyword.length == 0
+          ? ""
+          : this.searchForm.classKeyword[2];
+      let data = {
+        classId: classId,
+        username: this.searchForm.studentNameKeyword,
+        pageNo: this.paging.pageNo,
+        pageSize: this.paging.pageSize,
+      };
+      this.loading = true;
+      getStudents(data) //人脸放在学生表里的一个字段中，所以获取学生
+        .then((res) => {
+          this.studentData = res.data.data.students;
+          this.paging.total = res.data.data.pageInfo.totalCount;
+          console.log("人脸模块获取学生数据res", res);
+          this.loading = false;
+        })
+        .catch((err) => {
+          this.$message.error("人脸模块获取学生失败");
+          console.log("人脸模块获取学生数据err", err);
+          this.loading = false;
+        });
     },
   },
 };

@@ -8,12 +8,27 @@
       stripe
       v-loading="loading"
     >
-      <el-table-column align="center" type="selection" width="55" />
+      <!-- <el-table-column align="center" type="selection" width="55" /> -->
       <el-table-column align="center" label="学号" prop="stuNo" sortable />
       <el-table-column align="center" label="姓名" prop="username" sortable />
-      <el-table-column align="center" label="学院" prop="departmentName" sortable />
-      <el-table-column align="center" label="专业" prop="aclass.majorName" sortable />
-      <el-table-column align="center" label="班级" prop="aclass.classNo" sortable />
+      <el-table-column
+        align="center"
+        label="学院"
+        prop="departmentName"
+        sortable
+      />
+      <el-table-column
+        align="center"
+        label="专业"
+        prop="aclass.majorName"
+        sortable
+      />
+      <el-table-column
+        align="center"
+        label="班级"
+        prop="aclass.classNo"
+        sortable
+      />
       <el-table-column
         :formatter="dormConvert"
         align="center"
@@ -22,6 +37,23 @@
         sortable
       />
       <el-table-column align="center" label="联系方式" prop="phone" sortable />
+      <el-table-column
+        v-if="identity == 1"
+        align="center"
+        label="设为管理员"
+        prop="role"
+      >
+        <template #default="scope">
+          <el-switch
+            v-model="scope.row.role"
+            active-color="#13ce66"
+            inactive-color="#CCCCCC"
+            active-value="2"
+            inactive-value="1"
+          >
+          </el-switch>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作">
         <template #default="scope">
           <el-tooltip content="学生信息">
@@ -68,7 +100,10 @@
     ></el-pagination>
 
     <!-- 学生信息 -->
-    <student-detail :info="curStudentDetail" :visible.sync="isShowStudentDetail" />
+    <student-detail
+      :info="curStudentDetail"
+      :visible.sync="isShowStudentDetail"
+    />
 
     <!-- 编辑学生信息 -->
     <edit-student
@@ -105,6 +140,7 @@ export default {
       isShowModifyStudent: false,
       curStudentDetail: {},
       isShowAssignDorm: false,
+      identity: JSON.parse(window.localStorage.getItem("user")).role,
     };
   },
   methods: {

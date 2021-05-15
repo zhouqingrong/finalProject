@@ -19,9 +19,9 @@
       </div>
       <el-dropdown>
         <div class="avatar-wrap">
-          <img class="avatar" :src="user.photo" />
+          <img class="avatar" :src="photo" />
           <span class="header-text"
-            >欢迎您，{{ user.name }}
+            >欢迎您，{{ user.adminName }}
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
         </div>
@@ -54,11 +54,9 @@ export default {
   props: {},
   data() {
     return {
-      user: {
-        photo:
-          "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-        name: "zz",
-      },
+      photo:
+        "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+      user: {},
       isCollapse: false,
     };
   },
@@ -73,13 +71,7 @@ export default {
     //除了登录接口，其他所有接口都需要授权才能请求使用
     //或者说，除了登录接口，其他接口都需要提供你的身份令牌才能获取数据
     loadUserProfile() {
-      // 测试
-      // alert("获取授权");
-      console.log("获取授权");
-      // getUserProfile().then((res) => {
-      //   this.user = res.data.data;
-      //   console.log("111:", this.user.name);
-      // });
+      this.user = JSON.parse(window.localStorage.getItem("user"));
     },
     onLogout() {
       this.$confirm("确定退出吗?", "提示", {
@@ -91,7 +83,7 @@ export default {
           //把用户的登录状态清除
           window.localStorage.removeItem("user");
           //跳转到登录页面
-          this.$router.push("login");
+          this.$router.push("/");
         })
         .catch(() => {
           this.$message({

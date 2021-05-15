@@ -123,28 +123,7 @@ export default {
         pass: "sadmin", //验证码
         agree: false,
       },
-      // registerForm: {
-      //   userName: "",
-      //   pass: "",
-      //   checkPass: "",
-      // },
-      // regRules: {
-      //   userName: [
-      //     { required: true, message: "请输入账号", trigger: "change" },
-      //     {
-      //       pattern: /[0|1|2|3|4|5|6|7|8|9]\d{10}$/,
-      //       message: "请输入正确的账号格式",
-      //     },
-      //   ],
-      //   pass: [
-      //     { validator: validatePass, trigger: "change" },
-      //     { pattern: /\d{6}$/, message: "密码不少于6位" },
-      //   ],
-      //   checkPass: [
-      //     { validator: validatePass2, trigger: "change" },
-      //     { pattern: /\d{6}$/, message: "密码不少于6位" },
-      //   ],
-      // },
+
       loginRules: {
         //表单验证规则配置
         //要校验的数据名称：规则列表[]
@@ -192,18 +171,6 @@ export default {
       this.opt = 1;
       this.resetForm("registerForm");
     },
-    // onRegister() {
-    //   this.$refs["registerForm"].validate((valid) => {
-    //     if (valid) {
-    //       //调用注册接口
-    //       // this.register();
-    //       alert("submit!");
-    //     } else {
-    //       // console.log("error submit!!");
-    //       return;
-    //     }
-    //   });
-    // },
     onLogin() {
       //获取表单数据(根据接口数据绑定数据)
       // const user = this.user
@@ -257,10 +224,11 @@ export default {
             type: "success",
           });
           //本地存储字符串，只能存储字符串
-          // window.localStorage.setItem(
-          //   "user",
-          //   JSON.stringify(res.data.user_info)
-          // );
+          window.localStorage.setItem(
+            "user",
+            JSON.stringify(res.data.data.user)
+          );
+
           // console.log("登录请求成功：", res.data.user_info);
           //跳转到首页
           // this.$router.push('/') //根据路径进行跳转

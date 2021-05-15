@@ -2,105 +2,82 @@
   <div class="StudentConatainer">
     <!-- 面包屑 -->
     <Breadcrumb :path="path" />
-    <div class="page-container">
-      <section class="offset-fotm-item search">
-        <div>
-          <!-- 学生搜索栏 -->
-          <el-form inline>
-            <el-form-item label="搜索">
-              <el-input
-                clearable
-                placeholder="按学号搜索"
-                prefix-icon="el-icon-search"
-                size="medium"
-                v-model="searchForm.studentNoKeyword"
-              />
-            </el-form-item>
-            <el-form-item label>
-              <el-input
-                clearable
-                placeholder="按姓名搜索"
-                prefix-icon="el-icon-search"
-                size="medium"
-                v-model="searchForm.studentNameKeyword"
-              />
-            </el-form-item>
-            <el-form-item label="班级">
-              <el-cascader
-                clearable
-                v-model="searchForm.class"
-                :options="options"
-                @change="handleChange"
-              ></el-cascader>
-            </el-form-item>
-            <el-form-item>
-              <el-button native-type="submit" size="medium" type="primary" @click="getData()">搜索</el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-        <!-- 新增学生按钮 -->
-        <div style="margin-left: auto !important">
-          <el-button size="medium" type="info" @click="isShowAddDialog = true">新增学生</el-button>
-          <el-button size="medium" type="danger">批量删除学生</el-button>
-          <el-button size="medium" type="primary">批量导入学生</el-button>
-        </div>
-      </section>
+    <section class="offset-fotm-item search">
+      <div>
+        <!-- 记录搜索栏 -->
+        <el-form inline>
+          <el-form-item label="搜索">
+            <el-input
+              clearable
+              placeholder="按学号搜索"
+              prefix-icon="el-icon-search"
+              size="medium"
+              v-model="searchForm.studentNoKeyword"
+            />
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              clearable
+              placeholder="按姓名搜索"
+              prefix-icon="el-icon-search"
+              size="medium"
+              v-model="searchForm.studentNameKeyword"
+            />
+          </el-form-item>
+          <el-form-item label="班级" v-if="user.role == 2">
+            <el-cascader
+              clearable
+              v-model="searchForm.class"
+              :options="options"
+              @change="handleChange"
+            ></el-cascader>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              native-type="submit"
+              size="medium"
+              type="primary"
+              @click="getData()"
+              >搜索</el-button
+            >
+          </el-form-item>
+        </el-form>
+      </div>
+      <!-- 新增学生按钮 -->
+      <div style="margin-left: auto !important">
+        <el-button size="medium" type="info" @click="isShowAddDialog = true"
+          >新增学生</el-button
+        >
+        <!-- <el-button size="medium" type="danger">批量删除学生</el-button>
+          <el-button size="medium" type="primary">批量导入学生</el-button> -->
+      </div>
+    </section>
 
-      <!-- 学生表格 -->
-      <!--
+    <!-- 学生表格 -->
+    <!--
       @current-change="curPageChange"
       @update="getData"
       -->
-      <student-table
-        :cur-page="paging.pageNo"
-        :list="studentData"
-        :total="paging.total"
-        :cur-pageSize="paging.pageSize"
-        :loading="loading"
-        @select:students="onSelectStudents"
-        @current-change="curPageChange"
-        @size-change="curPageSizeChange"
-        @update="getData"
-        edit
-        del
-        class="margin-top-20 width-full"
-      />
+    <student-table
+      :cur-page="paging.pageNo"
+      :list="studentData"
+      :total="paging.total"
+      :cur-pageSize="paging.pageSize"
+      :loading="loading"
+      @select:students="onSelectStudents"
+      @current-change="curPageChange"
+      @size-change="curPageSizeChange"
+      @update="getData"
+      edit
+      del
+      class="margin-top-20 width-full"
+    />
 
-      <!-- 错误表格 -->
-      <!-- <el-dialog :visible.sync="isShowdeleteFailed" title="删除失败，请查看">
-        <div class="dialog-container">
-          <el-table :data="deleteFailedStudents" border stripe>
-            <el-table-column align="center" label="学号" prop="student_num" />
-            <el-table-column align="center" label="姓名" prop="student_name" />
-            <el-table-column align="center" label="宿舍" prop="dorm_num" />
-            <el-table-column align="center" label="原因">
-              <template #default="scope">
-                <p
-                  :key="index"
-                  class="color-danger"
-                  v-for="(item, index) in scope.row.reason"
-                >
-                  {{ item.msg }}
-                </p>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <template #footer>
-          <div class="text-center">
-            <el-button @click="isShowdeleteFailed = false" type="primary"
-              >确定</el-button
-            >
-          </div>
-        </template>
-      </el-dialog>-->
+    <!-- 新增学生 -->
+    <add-student :visible.sync="isShowAddDialog" @update="getData" />
 
-      <!-- 新增学生 -->
-      <add-student :visible.sync="isShowAddDialog" @update="getData" />
-
-      <!-- 批量导入学生 -->
-      <!-- <bulk-import-students :visible.sync="isShowBulkImport" /> -->
-    </div>
+    <!-- 批量导入学生 -->
+    <!-- <bulk-import-students :visible.sync="isShowBulkImport" /> -->
   </div>
 </template>
 <script>
@@ -116,6 +93,7 @@ export default {
   props: {},
   data() {
     return {
+      user: JSON.parse(window.localStorage.getItem("user")), //获取当前登录的用户的信息
       loading: false,
       paging: {
         pageNo: 1,

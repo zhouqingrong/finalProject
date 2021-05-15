@@ -37,7 +37,7 @@ export default {
     return {
       // isCollapse: true,
       route: "/home",
-      identity: 1,
+      identity: 2,
     };
   },
   computed: {
@@ -61,25 +61,25 @@ export default {
           title: "辅导员管理",
           index: "/adminInfo",
           icon: "el-icon-notebook-2",
-          show: identity === 1,
+          show: identity === 2,
         },
         {
           title: "班级管理",
           index: "/classInfo",
           icon: "el-icon-circle-check",
-          show: identity === 1,
+          show: identity === 2,
         },
         {
           title: "宿舍管理",
           index: "/dormitoryInfo",
           icon: "el-icon-circle-check",
-          show: identity === 1,
+          show: identity === 2,
         },
         {
           title: "人脸图库",
           index: "/faceInfo",
           icon: "el-icon-circle-check",
-          show: identity === 1,
+          show: identity === 2,
         },
 
         {
@@ -92,19 +92,13 @@ export default {
           title: "打卡记录",
           index: "/record",
           icon: "el-icon-circle-check",
-          show: identity === 2,
+          show: identity === 1,
         },
-        // {
-        //   title: "权限管理",
-        //   index: "/role",
-        //   icon: "el-icon-circle-check",
-        //   show: identity === 2,
-        // },
         {
           title: "个人设置",
           index: "/setting",
           icon: "el-icon-circle-check",
-          show: identity === 2,
+          show: identity === 1,
         },
       ];
     },
@@ -115,7 +109,9 @@ export default {
       this.route = route;
     });
   },
-  mounted() {},
+  mounted() {
+    this.identity = JSON.parse(window.localStorage.getItem("user")).role;
+  },
   methods: {},
 };
 </script>

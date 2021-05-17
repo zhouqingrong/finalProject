@@ -224,3 +224,17 @@ export const addAdmin = data => {
   })
 }
 
+export const addFace = (studentId, data) => {
+  return request({
+    method: 'PUT',
+    url: '/web/face/' + studentId,
+    data
+  })
+}
+
+export const deleteFace = data => {
+  return request({
+    method: 'DELETE',
+    url: '/web/face/' + data.studentId
+  })
+}

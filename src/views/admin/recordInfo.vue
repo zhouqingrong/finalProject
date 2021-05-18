@@ -15,7 +15,7 @@
               v-model="searchForm.studentNoKeyword"
             />
           </el-form-item>
-          <el-form-item label="">
+          <el-form-item label>
             <el-input
               clearable
               placeholder="按姓名搜索"
@@ -31,15 +31,20 @@
               :options="options"
               @change="handleChange"
             ></el-cascader>
-          </el-form-item> -->
+          </el-form-item>-->
           <el-form-item>
-            <el-button
-              native-type="submit"
-              size="medium"
-              type="primary"
-              @click="getData()"
-              >搜索</el-button
+            <el-button native-type="submit" size="medium" type="primary" @click="getData()">搜索</el-button>
+          </el-form-item>
+          <el-form-item>
+            <download-excel
+              class="export-excel-wrapper"
+              :data="recordData"
+              :fields="fields"
+              :name="fileName"
             >
+              <!-- 上面可以自定义自己的样式，还可以引用其他组件button -->
+              <el-button>导出</el-button>
+            </download-excel>
           </el-form-item>
         </el-form>
       </div>
@@ -48,7 +53,7 @@
         <el-button size="medium" type="info" @click="isShowAddDialog = true"
           >新增学生</el-button
         >
-      </div> -->
+      </div>-->
     </section>
     <!-- 记录的表格 -->
     <record-table
@@ -79,6 +84,22 @@ export default {
   props: {},
   data() {
     return {
+      fields: {
+        学号: "stuNo",
+        姓名: "username",
+        班级: "aclass.className",
+        状态: {
+          field:"recordStatus",
+          callback: value => {
+            if (value == false) {
+              return "未打卡"
+            } else {
+              return "已打卡"
+            }
+          }
+          }
+      },
+      fileName: new Date().toLocaleString() + "打卡记录",
       loading: false,
       paging: {
         pageNo: 1,

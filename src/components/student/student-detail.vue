@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { resideStatusMap, studyStatusMap } from "@/utils/staticData";
+// import { resideStatusMap, studyStatusMap } from "@/utils/staticData";
 
 export default {
   name: "student-detail",
@@ -47,11 +47,11 @@ export default {
   data() {
     return {};
   },
-  filters: {
-    resideConvert(v) {
-      return resideStatusMap.get(v);
-    },
-  },
+  // filters: {
+  //   resideConvert(v) {
+  //     return resideStatusMap.get(v);
+  //   },
+  // },
 };
 </script>
 

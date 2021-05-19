@@ -13,13 +13,21 @@
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-table :data="props.row.students">
-            <el-table-column align="center" label="学号" prop="stuNo"></el-table-column>
-            <el-table-column align="center" label="姓名" prop="username"></el-table-column>
+            <el-table-column
+              align="center"
+              label="学号"
+              prop="stuNo"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="姓名"
+              prop="username"
+            ></el-table-column>
             <el-table-column align="center" label="操作">
               <template #default="scope">
                 <el-tooltip content="删除" v-if="del">
                   <el-button
-                    @click="deleteDormStu(props.row,scope.row)"
+                    @click="deleteDormStu(props.row, scope.row)"
                     circle
                     icon="el-icon-delete font-size-16"
                     plain
@@ -32,7 +40,13 @@
           </el-table>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="序号" prop="id" sortable />
+      <el-table-column
+        align="center"
+        label="序号"
+        prop="id"
+        sortable
+        width="80"
+      />
       <el-table-column align="center" label="社区" prop="community" sortable />
       <el-table-column align="center" label="楼栋" prop="building" sortable />
       <el-table-column align="center" label="宿舍" prop="roomName" sortable />
@@ -68,7 +82,7 @@
             <el-button
               @click="showAddDormStu(scope.row)"
               circle
-              :disabled="scope.row.students.length>=scope.row.capacity"
+              :disabled="scope.row.students.length >= scope.row.capacity"
               icon="el-icon-user font-size-16"
               primary
               size="mini"
@@ -95,7 +109,11 @@
       :visible.sync="isShowModify"
       @update="$emit('update')"
     />
-    <edit-dormitory-student :info="curDetail" :visible.sync="isShowStudentDetail" @update="$emit('update')"/>
+    <edit-dormitory-student
+      :info="curDetail"
+      :visible.sync="isShowStudentDetail"
+      @update="$emit('update')"
+    />
   </div>
 </template>
 <script>

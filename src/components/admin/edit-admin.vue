@@ -14,7 +14,11 @@
         <el-form-item label="序号" prop="admin_num">
           <el-input :value="info.id" disabled style="width: 200px" />
         </el-form-item>
-        <el-form-item label="学院" prop="department" :rules="[{ required: true, message: '学院不能为空' }]">
+        <el-form-item
+          label="学院"
+          prop="department"
+          :rules="[{ required: true, message: '学院不能为空' }]"
+        >
           <el-select
             placeholder="选择学院"
             size="medium"
@@ -29,17 +33,34 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item :rules="[{ required: true, message: '账号不能为空' }]" label="账号" prop="account">
+        <el-form-item
+          :rules="[{ required: true, message: '账号不能为空' }]"
+          label="账号"
+          prop="account"
+        >
           <el-input style="width: 200px" v-model="info.account" />
         </el-form-item>
-        <el-form-item :rules="[{ required: true, message: '姓名不能为空' }]" label="姓名" prop="adminName">
+        <el-form-item
+          :rules="[{ required: true, message: '姓名不能为空' }]"
+          label="姓名"
+          prop="adminName"
+        >
           <el-input style="width: 200px" v-model="info.adminName" />
         </el-form-item>
-        <el-form-item :rules="[{ required: true, message: '联系方式不能为空' }]" label="电话" prop="phone">
+        <el-form-item
+          :rules="[{ required: true, message: '联系方式不能为空' }]"
+          label="电话"
+          prop="phone"
+        >
           <el-input style="width: 200px" v-model="info.phone" />
         </el-form-item>
         <el-form-item label="管理的班级" prop="admin_classes">
-          <el-cascader v-model="info.admin_classes" :options="options" :props="props" clearable></el-cascader>
+          <el-cascader
+            v-model="info.admin_classes"
+            :options="options"
+            :props="props"
+            clearable
+          ></el-cascader>
         </el-form-item>
         <section class="flex-center">
           <el-button @click="save" type="primary">保存</el-button>
@@ -130,17 +151,6 @@ export default {
             });
         }
       });
-
-      // 掉修改学生信息接口
-      // this.request.post("/api/student/updateOneById", form).then((res) => {
-      //   if (!res.data.errcode) {
-      //     this.$alert("修改成功！", "提示", { type: "success" });
-      //     this.closeDialog();
-      //     this.$emit("update");
-      //   } else {
-      //     this.$alert(res.data.msg, "错误", { type: "error" });
-      //   }
-      // });
     },
   },
 };

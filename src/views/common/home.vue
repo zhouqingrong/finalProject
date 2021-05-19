@@ -10,7 +10,7 @@
             <use xlink:href="#icon-tuandui-copy" class="icon-student" />
           </svg>
           <div class="text">
-            学生人数：<span class="num">{{ stuCount }}</span>
+            学生总数：<span class="num">{{ stuCount }}</span>
           </div>
         </div>
       </el-card>
@@ -23,7 +23,7 @@
             />
           </svg>
           <div class="text">
-            辅导员人数：<span class="num">{{ adminCount }}</span>
+            辅导员总数：<span class="num">{{ adminCount }}</span>
           </div>
         </div>
       </el-card>
@@ -33,7 +33,7 @@
             <use xlink:href="#icon-ziyuan" class="icon-student" />
           </svg>
           <div class="text">
-            宿舍间数：<span class="num">{{ dormitoryCount }}</span>
+            宿舍总数：<span class="num">{{ dormitoryCount }}</span>
           </div>
         </div>
       </el-card>

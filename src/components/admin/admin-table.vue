@@ -12,9 +12,21 @@
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-table :data="props.row.classes">
-            <el-table-column align="center" label="学院" prop="departmentName"></el-table-column>
-            <el-table-column align="center" label="专业" prop="majorName"></el-table-column>
-            <el-table-column align="center" label="班级" prop="classNo"></el-table-column>
+            <el-table-column
+              align="center"
+              label="学院"
+              prop="departmentName"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="专业"
+              prop="majorName"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="班级"
+              prop="classNo"
+            ></el-table-column>
           </el-table>
         </template>
       </el-table-column>
@@ -59,7 +71,11 @@
       :total="total"
     ></el-pagination>
     <!--  编辑/查看-->
-    <edit-admin :curDetail.sync="curDetail" :visible.sync="isShowModify" @update="$emit('update')" />
+    <edit-admin
+      :curDetail.sync="curDetail"
+      :visible.sync="isShowModify"
+      @update="$emit('update')"
+    />
   </div>
 </template>
 <script>

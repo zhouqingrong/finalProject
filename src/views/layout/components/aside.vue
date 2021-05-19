@@ -66,19 +66,19 @@ export default {
         {
           title: "班级管理",
           index: "/classInfo",
-          icon: "el-icon-circle-check",
+          icon: "el-icon-pie-chart",
           show: identity === 2,
         },
         {
           title: "宿舍管理",
           index: "/dormitoryInfo",
-          icon: "el-icon-circle-check",
+          icon: "el-icon-office-building",
           show: identity === 2,
         },
         {
           title: "人脸图库",
           index: "/faceInfo",
-          icon: "el-icon-circle-check",
+          icon: "el-icon-picture-outline-round",
           show: identity === 2,
         },
 
@@ -91,7 +91,7 @@ export default {
         {
           title: "打卡记录",
           index: "/record",
-          icon: "el-icon-circle-check",
+          icon: "el-icon-notebook-2",
           show: identity === 1,
         },
         {

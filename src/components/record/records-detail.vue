@@ -12,16 +12,20 @@
     </div> -->
     <el-table :data="info.records">
       <el-table-column label="日期">
-        <template #default="scope">{{days[scope.$index]}}</template>
+        <template #default="scope">{{ days[scope.$index] }}</template>
       </el-table-column>
-      <el-table-column :formatter="statusFormatter" label="状态" width="120px"/>
+      <el-table-column
+        :formatter="statusFormatter"
+        label="状态"
+        width="120px"
+      />
       <el-table-column :formatter="timeFormatter" label="打卡时间" />
     </el-table>
   </el-dialog>
 </template>
 
 <script>
-import { resideStatusMap } from "@/utils/staticData";
+// import { resideStatusMap } from "@/utils/staticData";
 
 export default {
   name: "records-detail",
@@ -38,8 +42,8 @@ export default {
     },
     timeFormatter(row, column, val) {
       if (row == null) {
-        return "---"
-      } 
+        return "---";
+      }
       return row.recordTimeFormat;
     },
     initDate() {
@@ -62,11 +66,11 @@ export default {
       lastDay: new Date().toLocaleString(),
     };
   },
-  filters: {
-    resideConvert(v) {
-      return resideStatusMap.get(v);
-    },
-  },
+  // filters: {
+  //   resideConvert(v) {
+  //     return resideStatusMap.get(v);
+  //   },
+  // },
 };
 </script>
 
